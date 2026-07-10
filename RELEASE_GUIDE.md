@@ -13,7 +13,7 @@ Before you can publish, configure Trusted Publishers on PyPI (most secure method
 3. **Add Trusted Publisher** with these values:
    ```
    PyPI Project Name: osm2geojson
-   Owner: aspectumapp
+   Owner: rapkin
    Repository: osm2geojson
    Workflow name: pythonpublish.yml
    Environment name: (leave blank)
@@ -88,7 +88,7 @@ git push origin master --tags
 
 ### 6. Create GitHub Release
 
-1. **Go to GitHub**: https://github.com/aspectumapp/osm2geojson/releases/new
+1. **Go to GitHub**: https://github.com/rapkin/osm2geojson/releases/new
 2. **Select tag**: Choose `v0.2.10`
 3. **Release title**: `v0.2.10` or `Release 0.2.10`
 4. **Description**: Add release notes (see template below)
@@ -100,7 +100,7 @@ git push origin master --tags
 
 After ~2-5 minutes:
 
-1. Check workflow: https://github.com/aspectumapp/osm2geojson/actions
+1. Check workflow: https://github.com/rapkin/osm2geojson/actions
 2. Verify on PyPI: https://pypi.org/project/osm2geojson/
 3. Test installation:
    ```bash
@@ -133,7 +133,7 @@ After ~2-5 minutes:
 ### 🙏 Contributors
 Thanks to @username1, @username2 for their contributions!
 
-**Full Changelog**: https://github.com/aspectumapp/osm2geojson/compare/v0.2.9...v0.2.10
+**Full Changelog**: https://github.com/rapkin/osm2geojson/compare/v0.2.9...v0.2.10
 ```
 
 ## Troubleshooting

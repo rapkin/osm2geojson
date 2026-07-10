@@ -72,7 +72,7 @@ make test-build    # Test the build
 
 ### Old Setup
 ```bash
-git clone https://github.com/aspectumapp/osm2geojson.git
+git clone https://github.com/rapkin/osm2geojson.git
 cd osm2geojson
 python setup.py develop
 ./lint.sh          # Check code
@@ -82,7 +82,7 @@ python -m unittest  # Run tests
 
 ### New Setup
 ```bash
-git clone --recurse-submodules https://github.com/aspectumapp/osm2geojson.git
+git clone --recurse-submodules https://github.com/rapkin/osm2geojson.git
 cd osm2geojson
 make setup         # One command!
 make all           # Check everything

@@ -32,9 +32,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/aspectumapp/osm2geojson"
-Repository = "https://github.com/aspectumapp/osm2geojson"
-Issues = "https://github.com/aspectumapp/osm2geojson/issues"
+Homepage = "https://github.com/rapkin/osm2geojson"
+Repository = "https://github.com/rapkin/osm2geojson"
+Issues = "https://github.com/rapkin/osm2geojson/issues"
 
 [project.scripts]
 osm2geojson = "osm2geojson.__main__:main"

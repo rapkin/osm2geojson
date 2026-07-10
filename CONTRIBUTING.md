@@ -10,7 +10,7 @@ Thank you for your interest in contributing to osm2geojson!
 
 ```bash
 # Setup (one-time)
-git clone --recurse-submodules https://github.com/aspectumapp/osm2geojson.git
+git clone --recurse-submodules https://github.com/rapkin/osm2geojson.git
 cd osm2geojson
 make setup              # Install deps + pre-commit hooks
 
@@ -38,7 +38,7 @@ ruff check --diff .                          # See what would change
 
 ```bash
 # Clone with submodules
-git clone --recurse-submodules https://github.com/aspectumapp/osm2geojson.git
+git clone --recurse-submodules https://github.com/rapkin/osm2geojson.git
 cd osm2geojson
 
 # Complete setup (one command)

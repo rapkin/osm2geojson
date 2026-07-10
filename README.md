@@ -1,6 +1,6 @@
 # osm2geojson
 
-![Test package](https://github.com/aspectumapp/osm2geojson/workflows/Test%20package/badge.svg)
+![Test package](https://github.com/rapkin/osm2geojson/workflows/Test%20package/badge.svg)
 [![PyPI version](https://img.shields.io/pypi/v/osm2geojson.svg)](https://pypi.org/project/osm2geojson/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- [![Python versions](https://img.shields.io/pypi/pyversions/osm2geojson.svg)](https://pypi.org/project/osm2geojson/) -->
@@ -176,7 +176,7 @@ geojson = osm2geojson.json2geojson(result)
 
 ```bash
 # Clone with submodules
-git clone --recurse-submodules https://github.com/aspectumapp/osm2geojson.git
+git clone --recurse-submodules https://github.com/rapkin/osm2geojson.git
 cd osm2geojson
 
 # One-command setup (installs deps + pre-commit hooks)
@@ -288,4 +288,4 @@ Uses data from:
 
  * Rewrite _convert_shapes_to_multipolygon (and other multipolygon methods) to support complex situations with enclaves
  * Add tests and examples for cli tool
- * Add actions related to cli tool (more info https://github.com/aspectumapp/osm2geojson/pull/32#issuecomment-1073386381)
+ * Add actions related to cli tool (more info https://github.com/rapkin/osm2geojson/pull/32#issuecomment-1073386381)
