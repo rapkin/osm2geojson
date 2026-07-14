@@ -104,6 +104,29 @@ class TestOsm2GeoJsonMethods(unittest.TestCase):
         self.assertEqual(result["features"][0]["geometry"]["type"], "LineString")
         self.assertDictEqual(saved_geojson, result)
 
+    def test_relation_member_ways_filtered(self):
+        """
+        Queries like "rel(ID); way(r); out geom;" return the relation and its member
+        ways as separate elements, each with inline geometry. Member ways without
+        interesting tags of their own must not appear as extra features, while tagged
+        members (islands inside the river, nature reserves) are features in their own
+        right and must survive the filter — same behaviour as osmtogeojson.
+
+        Regression test for relation 1685222 (Rheinfall area of the Rhein river):
+        41 member ways, of which 11 carry their own tags.
+        """
+        (data, saved_geojson) = get_json_and_geojson_data("issue-relation-member-ways-filtered")
+        result = json2geojson(data)
+
+        self.assertEqual(len(result["features"]), 12)
+        relations = [f for f in result["features"] if f["properties"]["type"] == "relation"]
+        ways = [f for f in result["features"] if f["properties"]["type"] == "way"]
+        self.assertEqual(len(relations), 1)
+        self.assertEqual(len(ways), 11)
+        names = {f["properties"]["tags"]["name"] for f in ways if "name" in f["properties"]["tags"]}
+        self.assertIn("Insel Rheinau", names)
+        self.assertDictEqual(saved_geojson, result)
+
 
 if __name__ == "__main__":
     unittest.main()

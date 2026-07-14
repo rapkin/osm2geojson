@@ -229,6 +229,32 @@ def build_refs_index(elements):
     return {get_ref_name(el): el for el in elements}
 
 
+# Tag keys that don't make an element a feature in its own right
+# (same blacklist as osmtogeojson)
+UNINTERESTING_TAGS = {
+    "source",
+    "source_ref",
+    "source:ref",
+    "history",
+    "attribution",
+    "created_by",
+    "tiger:county",
+    "tiger:tlid",
+    "tiger:upload_uuid",
+}
+
+
+def has_interesting_tags(tags, ignore_tags=None):
+    ignore_tags = ignore_tags or {}
+    for key, value in (tags or {}).items():
+        if key in UNINTERESTING_TAGS:
+            continue
+        if key in ignore_tags and ignore_tags[key] == value:
+            continue
+        return True
+    return False
+
+
 def node_to_shape(node):
     return {"shape": Point(node["lon"], node["lat"]), "properties": get_element_props(node)}
 
@@ -607,6 +633,18 @@ def multipolygon_relation_to_shape(
             continue
 
         member["used"] = rel["id"]
+
+        # When member ways are also returned as separate elements (e.g. "rel(ID); way(r);
+        # out geom;"), members carry inline geometry and way_to_shape never touches the
+        # indexed element, so mark it as used here. Ways with their own interesting tags
+        # (islands inside a lake, nature reserves, ...) are features in their own right
+        # and stay in the output; for outer ways the relation's tags don't count as
+        # interesting (old-style multipolygon tagging).
+        found_way = get_ref(member, refs_index, silent=True)
+        if found_way is not None:
+            ignore_tags = rel.get("tags") if member.get("role") == "outer" else None
+            if not has_interesting_tags(found_way.get("tags"), ignore_tags):
+                found_way["used"] = rel["id"]
 
         way_shape = way_to_shape(
             member, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
