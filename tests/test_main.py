@@ -29,7 +29,6 @@ class TestOsm2GeoJsonMethods(unittest.TestCase):
             (data, saved_geojson) = get_osm_and_geojson_data(name)
             self.assertDictEqual(saved_geojson, data)
 
-    @unittest.skip("Overpass API returns 504 error")
     def test_parsing_from_overpass(self):
         """
         Test city border convertation to MultiPolygon

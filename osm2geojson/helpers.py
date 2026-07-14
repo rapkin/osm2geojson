@@ -11,6 +11,9 @@ import requests
 
 
 OVERPASS = "https://overpass-api.de/api/interpreter/"
+# overpass-api.de rejects generic client User-Agents (e.g. python-requests) with 406,
+# and the usage policy asks clients to identify themselves
+USER_AGENT = "osm2geojson (+https://github.com/rapkin/osm2geojson)"
 dirname = os.path.dirname(os.path.dirname(__file__))
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -77,7 +80,10 @@ def overpass_call(query: str) -> str:
     r = requests.post(
         OVERPASS,
         data=f"data={encoded}",
-        headers={"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            "User-Agent": USER_AGENT,
+        },
     )
     if r.status_code != 200:
         raise requests.exceptions.HTTPError(f"Overpass server respond with status {r.status_code}")

@@ -99,7 +99,7 @@ class TestParseXmlMethods(unittest.TestCase):
 
             self.assertDictEqual(saved_json, parsed_json)
 
-    @unittest.skip("This test takes a lot of time. Also overpass API returns 504 error")
+    @unittest.skip("This test takes a lot of time (8 live Overpass API calls)")
     def test_overpass_queries(self):
         """
         Test several queries to overpass
