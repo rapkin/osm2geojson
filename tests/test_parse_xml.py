@@ -1,7 +1,10 @@
 import json
+import os
 import unittest
 
 from osm2geojson import overpass_call, parse_xml, read_data_file
+
+LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS")
 
 
 class TestParseXmlMethods(unittest.TestCase):
@@ -99,7 +102,9 @@ class TestParseXmlMethods(unittest.TestCase):
 
             self.assertDictEqual(saved_json, parsed_json)
 
-    @unittest.skip("This test takes a lot of time (8 live Overpass API calls)")
+    @unittest.skipUnless(
+        LIVE_TESTS, "slow live test (8 Overpass API calls); set OSM2GEOJSON_LIVE_TESTS=1 to run"
+    )
     def test_overpass_queries(self):
         """
         Test several queries to overpass

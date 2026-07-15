@@ -1,7 +1,10 @@
 import json
+import os
 import unittest
 
 from osm2geojson import json2geojson, overpass_call, read_data_file, xml2geojson
+
+LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS")
 
 
 def get_osm_and_geojson_data(name):
@@ -29,6 +32,7 @@ class TestOsm2GeoJsonMethods(unittest.TestCase):
             (data, saved_geojson) = get_osm_and_geojson_data(name)
             self.assertDictEqual(saved_geojson, data)
 
+    @unittest.skipUnless(LIVE_TESTS, "live Overpass API test; set OSM2GEOJSON_LIVE_TESTS=1 to run")
     def test_parsing_from_overpass(self):
         """
         Test city border convertation to MultiPolygon
