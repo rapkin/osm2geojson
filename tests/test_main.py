@@ -4,6 +4,7 @@ import unittest
 
 from osm2geojson import json2geojson, overpass_call, read_data_file, xml2geojson
 
+
 LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS")
 
 
