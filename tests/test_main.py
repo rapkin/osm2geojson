@@ -126,6 +126,26 @@ class TestOsm2GeoJsonMethods(unittest.TestCase):
         self.assertIn("Insel Rheinau", names)
         self.assertDictEqual(saved_geojson, result)
 
+    def test_filter_used_refs_id_spaces(self):
+        """
+        Node, way and relation ids live in separate id-spaces. A node consumed by a
+        way must not cause an unrelated way/relation with the same numeric id to be
+        filtered out.
+        """
+        data = {
+            "elements": [
+                {"type": "node", "id": 1, "lat": 1.0, "lon": 0.0},
+                {"type": "node", "id": 2, "lat": 2.0, "lon": 0.0},
+                {"type": "way", "id": 1, "tags": {"highway": "road"}, "nodes": [1, 2]},
+            ]
+        }
+        result = json2geojson(data)
+
+        self.assertEqual(len(result["features"]), 1)
+        props = result["features"][0]["properties"]
+        self.assertEqual(props["type"], "way")
+        self.assertEqual(props["id"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

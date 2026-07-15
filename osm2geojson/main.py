@@ -168,12 +168,13 @@ def _json2shapes(
     if not filter_used_refs:
         return shapes
 
-    used = {ref["id"]: ref["used"] for ref in refs if "used" in ref}
+    # key by (type, id): node, way and relation ids live in separate id-spaces
+    used = {(ref["type"], ref["id"]): ref["used"] for ref in refs if "used" in ref}
     filtered_shapes = []
     for shape in shapes:
         if "properties" not in shape:
             warning("Shape without props", pformat(shape))
-        if shape["properties"]["id"] in used:
+        if (shape["properties"].get("type"), shape["properties"].get("id")) in used:
             continue
         filtered_shapes.append(shape)
 
@@ -638,11 +639,14 @@ def multipolygon_relation_to_shape(
         # out geom;"), members carry inline geometry and way_to_shape never touches the
         # indexed element, so mark it as used here. Ways with their own interesting tags
         # (islands inside a lake, nature reserves, ...) are features in their own right
-        # and stay in the output; for outer ways the relation's tags don't count as
-        # interesting (old-style multipolygon tagging).
+        # and stay in the output. For ref-resolved outer ways the relation's tags don't
+        # count as interesting (old-style multipolygon tagging); members with inline
+        # geometry keep their own tags meaningful.
         found_way = get_ref(member, refs_index, silent=True)
         if found_way is not None:
-            ignore_tags = rel.get("tags") if member.get("role") == "outer" else None
+            ignore_tags = None
+            if member.get("role") == "outer" and "geometry" not in member:
+                ignore_tags = rel.get("tags")
             if not has_interesting_tags(found_way.get("tags"), ignore_tags):
                 found_way["used"] = rel["id"]
 
