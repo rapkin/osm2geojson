@@ -1,0 +1,7740 @@
+[
+ {
+  "name": "osm (xml) / blank osm",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (xml) / node",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm><node id='1' lat='1.234' lon='4.321' /></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": "1",
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (xml) / way",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm><way id='1'><nd ref='2' /><nd ref='3' /><nd ref='4' /></way><node id='2' lat='0.0' lon='1.0' /><node id='3' lat='0.0' lon='1.1' /><node id='4' lat='0.1' lon='1.2' /></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          0
+         ],
+         [
+          1.1,
+          0
+         ],
+         [
+          1.2,
+          0.1
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (xml) / relation",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm><relation id='1'><tag k='type' v='multipolygon' /><member type='way' ref='2' role='outer' /><member type='way' ref='3' role='inner' /></relation><way id='2'><tag k='area' v='yes' /><nd ref='4' /><nd ref='5' /><nd ref='6' /><nd ref='7' /><nd ref='4' /></way><way id='3'><nd ref='8' /><nd ref='9' /><nd ref='10' /><nd ref='8' /></way><node id='4' lat='-1.0' lon='-1.0' /><node id='5' lat='-1.0' lon='1.0' /><node id='6' lat='1.0' lon='1.0' /><node id='7' lat='1.0' lon='-1.0' /><node id='8' lat='-0.5' lon='0.0' /><node id='9' lat='0.5' lon='0.0' /><node id='10' lat='0.0' lon='0.5' /></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": "1",
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           -1,
+           -1
+          ],
+          [
+           1,
+           -1
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           -1,
+           1
+          ],
+          [
+           -1,
+           -1
+          ]
+         ],
+         [
+          [
+           0,
+           -0.5
+          ],
+          [
+           0,
+           0.5
+          ],
+          [
+           0.5,
+           0
+          ],
+          [
+           0,
+           -0.5
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / node",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1.234,
+       "lon": 4.321
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / way",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        2,
+        3,
+        4
+       ]
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 1.1
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0.1,
+       "lon": 1.2
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          0
+         ],
+         [
+          1.1,
+          0
+         ],
+         [
+          1.2,
+          0.1
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / polygon",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        2,
+        3,
+        4,
+        5,
+        2
+       ],
+       "tags": {
+        "area": "yes"
+       }
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 1,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / simple multipolygon",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "inner"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        7,
+        4
+       ],
+       "tags": {
+        "area": "yes"
+       }
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        8,
+        9,
+        10,
+        8
+       ]
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": -1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": -1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 7,
+       "lat": 1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 8,
+       "lat": -0.5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 9,
+       "lat": 0.5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 10,
+       "lat": 0,
+       "lon": 0.5
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           -1,
+           -1
+          ],
+          [
+           1,
+           -1
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           -1,
+           1
+          ],
+          [
+           -1,
+           -1
+          ]
+         ],
+         [
+          [
+           0,
+           -0.5
+          ],
+          [
+           0,
+           0.5
+          ],
+          [
+           0.5,
+           0
+          ],
+          [
+           0,
+           -0.5
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "inner"
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / multipolygon",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon",
+        "building": "yes"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "inner"
+        },
+        {
+         "type": "way",
+         "ref": 4,
+         "role": "inner"
+        },
+        {
+         "type": "way",
+         "ref": 5,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        7,
+        4
+       ],
+       "tags": {
+        "building": "yes"
+       }
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        8,
+        9,
+        10,
+        8
+       ],
+       "tags": {
+        "area": "yes"
+       }
+      },
+      {
+       "type": "way",
+       "id": 4,
+       "nodes": [
+        11,
+        12,
+        13,
+        11
+       ],
+       "tags": {
+        "barrier": "fence"
+       }
+      },
+      {
+       "type": "way",
+       "id": 5,
+       "nodes": [
+        14,
+        15,
+        16,
+        14
+       ],
+       "tags": {
+        "building": "yes",
+        "area": "yes"
+       }
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": -1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": -1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 7,
+       "lat": 1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 8,
+       "lat": -0.5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 9,
+       "lat": 0.5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 10,
+       "lat": 0,
+       "lon": 0.5
+      },
+      {
+       "type": "node",
+       "id": 11,
+       "lat": 0.1,
+       "lon": -0.1
+      },
+      {
+       "type": "node",
+       "id": 12,
+       "lat": -0.1,
+       "lon": -0.1
+      },
+      {
+       "type": "node",
+       "id": 13,
+       "lat": 0,
+       "lon": -0.2
+      },
+      {
+       "type": "node",
+       "id": 14,
+       "lat": 0.1,
+       "lon": -1.1
+      },
+      {
+       "type": "node",
+       "id": 15,
+       "lat": -0.1,
+       "lon": -1.1
+      },
+      {
+       "type": "node",
+       "id": 16,
+       "lat": 0,
+       "lon": -1.2
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon",
+         "building": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+         [
+          [
+           [
+            -1.1,
+            0.1
+           ],
+           [
+            -1.2,
+            0
+           ],
+           [
+            -1.1,
+            -0.1
+           ],
+           [
+            -1.1,
+            0.1
+           ]
+          ]
+         ],
+         [
+          [
+           [
+            -1,
+            -1
+           ],
+           [
+            1,
+            -1
+           ],
+           [
+            1,
+            1
+           ],
+           [
+            -1,
+            1
+           ],
+           [
+            -1,
+            -1
+           ]
+          ],
+          [
+           [
+            -0.1,
+            0.1
+           ],
+           [
+            -0.1,
+            -0.1
+           ],
+           [
+            -0.2,
+            0
+           ],
+           [
+            -0.1,
+            0.1
+           ]
+          ],
+          [
+           [
+            0,
+            -0.5
+           ],
+           [
+            0,
+            0.5
+           ],
+           [
+            0.5,
+            0
+           ],
+           [
+            0,
+            -0.5
+           ]
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/3",
+       "properties": {
+        "type": "way",
+        "id": 3,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [
+         {
+          "role": "inner",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "building": "yes"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           -0.5
+          ],
+          [
+           0.5,
+           0
+          ],
+          [
+           0,
+           0.5
+          ],
+          [
+           0,
+           -0.5
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/5",
+       "properties": {
+        "type": "way",
+        "id": 5,
+        "tags": {
+         "building": "yes",
+         "area": "yes"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "building": "yes"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           -1.1,
+           0.1
+          ],
+          [
+           -1.2,
+           0
+          ],
+          [
+           -1.1,
+           -0.1
+          ],
+          [
+           -1.1,
+           0.1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/4",
+       "properties": {
+        "type": "way",
+        "id": 4,
+        "tags": {
+         "barrier": "fence"
+        },
+        "relations": [
+         {
+          "role": "inner",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "building": "yes"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          -0.1,
+          0.1
+         ],
+         [
+          -0.1,
+          -0.1
+         ],
+         [
+          -0.2,
+          0
+         ],
+         [
+          -0.1,
+          0.1
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon",
+        "building": "yes"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "inner"
+        },
+        {
+         "type": "way",
+         "ref": 4,
+         "role": "inner"
+        },
+        {
+         "type": "way",
+         "ref": 5,
+         "role": ""
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        7,
+        4
+       ],
+       "tags": {
+        "building": "yes"
+       }
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        8,
+        9,
+        10,
+        8
+       ],
+       "tags": {
+        "area": "yes"
+       }
+      },
+      {
+       "type": "way",
+       "id": 4,
+       "nodes": [
+        11,
+        12,
+        13,
+        11
+       ],
+       "tags": {
+        "barrier": "fence"
+       }
+      },
+      {
+       "type": "way",
+       "id": 5,
+       "nodes": [
+        14,
+        15,
+        16,
+        14
+       ],
+       "tags": {
+        "building": "yes",
+        "area": "yes"
+       }
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": -1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": -1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 7,
+       "lat": 1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 8,
+       "lat": -0.5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 9,
+       "lat": 0.5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 10,
+       "lat": 0,
+       "lon": 0.5
+      },
+      {
+       "type": "node",
+       "id": 11,
+       "lat": 0.1,
+       "lon": -0.1
+      },
+      {
+       "type": "node",
+       "id": 12,
+       "lat": -0.1,
+       "lon": -0.1
+      },
+      {
+       "type": "node",
+       "id": 13,
+       "lat": 0,
+       "lon": -0.2
+      },
+      {
+       "type": "node",
+       "id": 14,
+       "lat": 0.1,
+       "lon": -1.1
+      },
+      {
+       "type": "node",
+       "id": 15,
+       "lat": -0.1,
+       "lon": -1.1
+      },
+      {
+       "type": "node",
+       "id": 16,
+       "lat": 0,
+       "lon": -1.2
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon",
+         "building": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+         [
+          [
+           [
+            -1.1,
+            0.1
+           ],
+           [
+            -1.2,
+            0
+           ],
+           [
+            -1.1,
+            -0.1
+           ],
+           [
+            -1.1,
+            0.1
+           ]
+          ]
+         ],
+         [
+          [
+           [
+            -1,
+            -1
+           ],
+           [
+            1,
+            -1
+           ],
+           [
+            1,
+            1
+           ],
+           [
+            -1,
+            1
+           ],
+           [
+            -1,
+            -1
+           ]
+          ],
+          [
+           [
+            -0.1,
+            0.1
+           ],
+           [
+            -0.1,
+            -0.1
+           ],
+           [
+            -0.2,
+            0
+           ],
+           [
+            -0.1,
+            0.1
+           ]
+          ],
+          [
+           [
+            0,
+            -0.5
+           ],
+           [
+            0,
+            0.5
+           ],
+           [
+            0.5,
+            0
+           ],
+           [
+            0,
+            -0.5
+           ]
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/3",
+       "properties": {
+        "type": "way",
+        "id": 3,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [
+         {
+          "role": "inner",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "building": "yes"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           -0.5
+          ],
+          [
+           0.5,
+           0
+          ],
+          [
+           0,
+           0.5
+          ],
+          [
+           0,
+           -0.5
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/5",
+       "properties": {
+        "type": "way",
+        "id": 5,
+        "tags": {
+         "building": "yes",
+         "area": "yes"
+        },
+        "relations": [
+         {
+          "role": "",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "building": "yes"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           -1.1,
+           0.1
+          ],
+          [
+           -1.2,
+           0
+          ],
+          [
+           -1.1,
+           -0.1
+          ],
+          [
+           -1.1,
+           0.1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/4",
+       "properties": {
+        "type": "way",
+        "id": 4,
+        "tags": {
+         "barrier": "fence"
+        },
+        "relations": [
+         {
+          "role": "inner",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "building": "yes"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          -0.1,
+          0.1
+         ],
+         [
+          -0.1,
+          -0.1
+         ],
+         [
+          -0.2,
+          0
+         ],
+         [
+          -0.1,
+          0.1
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / route relation",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "route"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "forward"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "backward"
+        },
+        {
+         "type": "way",
+         "ref": 4,
+         "role": "forward"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5
+       ]
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        5,
+        6
+       ]
+      },
+      {
+       "type": "way",
+       "id": 4,
+       "nodes": [
+        7,
+        8
+       ]
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": -1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 7,
+       "lat": 10,
+       "lon": 10
+      },
+      {
+       "type": "node",
+       "id": 8,
+       "lat": 20,
+       "lon": 20
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "route"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+         [
+          [
+           10,
+           10
+          ],
+          [
+           20,
+           20
+          ]
+         ],
+         [
+          [
+           -1,
+           -1
+          ],
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / tags: ways and nodes / pois",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        2,
+        3,
+        4
+       ],
+       "tags": {
+        "foo": "bar"
+       }
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 1.1,
+       "tags": {
+        "asd": "fasd"
+       }
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0.1,
+       "lon": 1.2,
+       "tags": {
+        "created_by": "me"
+       }
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 0,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "foo": "bar"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          0
+         ],
+         [
+          1.1,
+          0
+         ],
+         [
+          1.2,
+          0.1
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/3",
+       "properties": {
+        "type": "node",
+        "id": 3,
+        "tags": {
+         "asd": "fasd"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         1.1,
+         0
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/5",
+       "properties": {
+        "type": "node",
+        "id": 5,
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         0,
+         0
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / one-node-ways",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        2
+       ],
+       "tags": {
+        "foo": "bar"
+       }
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 0,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / invalid multipolygon: empty",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / invalid multipolygon: missing members",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / invalid multipolygon: empty members",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / invalid route: empty",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "route"
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / invalid route: missing members",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "route"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "forward"
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / invalid route: empty members",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "route"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "forward"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / relations and id-spaces",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "tags": {
+        "foo": "bar"
+       },
+       "nodes": [
+        1,
+        2,
+        3
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        3,
+        1
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 2
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 1,
+       "lon": 2
+      },
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "foo": "bar"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "asd"
+        },
+        {
+         "type": "node",
+         "ref": 1,
+         "role": "fasd"
+        },
+        {
+         "type": "relation",
+         "ref": 2,
+         "role": ""
+        }
+       ]
+      },
+      {
+       "type": "relation",
+       "id": 2,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/2",
+       "properties": {
+        "type": "relation",
+        "id": 2,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [
+         {
+          "role": "",
+          "rel": 1,
+          "reltags": {
+           "foo": "bar"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           2
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           2,
+           1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "foo": "bar"
+        },
+        "relations": [
+         {
+          "role": "asd",
+          "rel": 1,
+          "reltags": {
+           "foo": "bar"
+          }
+         },
+         {
+          "role": "outer",
+          "rel": 2,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ],
+         [
+          2,
+          1
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": 1,
+        "tags": {},
+        "relations": [
+         {
+          "role": "fasd",
+          "rel": 1,
+          "reltags": {
+           "foo": "bar"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / meta data",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1.234,
+       "lon": 4.321,
+       "timestamp": "2013-01-13T22:56:07Z",
+       "version": 7,
+       "changeset": 1234,
+       "user": "johndoe",
+       "uid": 666
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {
+         "timestamp": "2013-01-13T22:56:07Z",
+         "version": 7,
+         "changeset": 1234,
+         "user": "johndoe",
+         "uid": 666
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1.234,
+       "lon": 4.321,
+       "tags": {
+        "amenity": "yes"
+       },
+       "user": "johndoe"
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "tags": {
+        "highway": "road"
+       },
+       "user": "johndoe",
+       "nodes": [
+        1,
+        1,
+        1,
+        1
+       ]
+      },
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "user": "johndoe",
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "tags": {
+        "highway": "road"
+       },
+       "user": "johndoe",
+       "nodes": [
+        1,
+        1,
+        1,
+        1
+       ]
+      },
+      {
+       "type": "relation",
+       "id": 2,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "user": "johndoe",
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {
+         "user": "johndoe"
+        }
+       },
+       "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+         [
+          [
+           [
+            4.321,
+            1.234
+           ],
+           [
+            4.321,
+            1.234
+           ],
+           [
+            4.321,
+            1.234
+           ],
+           [
+            4.321,
+            1.234
+           ]
+          ]
+         ],
+         [
+          [
+           [
+            4.321,
+            1.234
+           ],
+           [
+            4.321,
+            1.234
+           ],
+           [
+            4.321,
+            1.234
+           ],
+           [
+            4.321,
+            1.234
+           ]
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {
+         "highway": "road"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 2,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {
+         "user": "johndoe"
+        }
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           4.321,
+           1.234
+          ],
+          [
+           4.321,
+           1.234
+          ],
+          [
+           4.321,
+           1.234
+          ],
+          [
+           4.321,
+           1.234
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "highway": "road"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         },
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {
+         "user": "johndoe"
+        }
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          4.321,
+          1.234
+         ],
+         [
+          4.321,
+          1.234
+         ],
+         [
+          4.321,
+          1.234
+         ],
+         [
+          4.321,
+          1.234
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": 1,
+        "tags": {
+         "amenity": "yes"
+        },
+        "relations": [],
+        "meta": {
+         "user": "johndoe"
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / multipolygon: outer way tagging",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon",
+        "amenity": "xxx"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "inner"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        7,
+        4
+       ],
+       "tags": {
+        "amenity": "yyy"
+       }
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        8,
+        9,
+        10,
+        8
+       ]
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": -1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": -1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 7,
+       "lat": 1,
+       "lon": -1
+      },
+      {
+       "type": "node",
+       "id": 8,
+       "lat": -0.5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 9,
+       "lat": 0.5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 10,
+       "lat": 0,
+       "lon": 0.5
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon",
+         "amenity": "xxx"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           -1,
+           -1
+          ],
+          [
+           1,
+           -1
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           -1,
+           1
+          ],
+          [
+           -1,
+           -1
+          ]
+         ],
+         [
+          [
+           0,
+           -0.5
+          ],
+          [
+           0,
+           0.5
+          ],
+          [
+           0.5,
+           0
+          ],
+          [
+           0,
+           -0.5
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {
+         "amenity": "yyy"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "amenity": "xxx"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           -1,
+           -1
+          ],
+          [
+           1,
+           -1
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           -1,
+           1
+          ],
+          [
+           -1,
+           -1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / multipolygon: non-matching inner and outer rings",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": -1,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "inner"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        7,
+        4
+       ]
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 7,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        8,
+        9,
+        10,
+        8
+       ]
+      },
+      {
+       "type": "node",
+       "id": 8,
+       "lat": 3,
+       "lon": 3
+      },
+      {
+       "type": "node",
+       "id": 9,
+       "lat": 4,
+       "lon": 3
+      },
+      {
+       "type": "node",
+       "id": 10,
+       "lat": 3,
+       "lon": 4
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "inner"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        7,
+        4
+       ]
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 7,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        8,
+        9,
+        10,
+        8
+       ]
+      },
+      {
+       "type": "node",
+       "id": 8,
+       "lat": 3,
+       "lon": 3
+      },
+      {
+       "type": "node",
+       "id": 9,
+       "lat": 4,
+       "lon": 3
+      },
+      {
+       "type": "node",
+       "id": 10,
+       "lat": 3,
+       "lon": 4
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {},
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / multipolygon: non-trivial ring building",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        2,
+        3
+       ]
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        3,
+        1
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 3,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 4,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 5,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 6,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        2,
+        3
+       ]
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        4,
+        3
+       ]
+      },
+      {
+       "type": "way",
+       "id": 4,
+       "nodes": [
+        5,
+        4
+       ]
+      },
+      {
+       "type": "way",
+       "id": 5,
+       "nodes": [
+        5,
+        6
+       ]
+      },
+      {
+       "type": "way",
+       "id": 6,
+       "nodes": [
+        1,
+        6
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 3,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 4,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 5,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 6,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           5
+          ],
+          [
+           0,
+           6
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           4
+          ],
+          [
+           0,
+           5
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / multipolygon: unclosed ring",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2,
+        3,
+        4
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        3,
+        2
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 3,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 4,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           4
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        2,
+        3,
+        4
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 3,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 4,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           4
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "osm (json) / overpass area",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "area",
+       "id": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "defaults / interesting objects",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "tags": {
+        "created_by": "foo"
+       },
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "tags": {
+        "interesting": "yes"
+       },
+       "lat": 2,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          0,
+          1
+         ],
+         [
+          0,
+          2
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/2",
+       "properties": {
+        "type": "node",
+        "id": 2,
+        "tags": {
+         "interesting": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         0,
+         2
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "defaults / interesting objects: relation members",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm version=\"0.6\" generator=\"OpenStreetMap server\" copyright=\"OpenStreetMap and contributors\" attribution=\"https://www.openstreetmap.org/copyright\" license=\"https://opendatacommons.org/licenses/odbl/1-0/\"><relation id=\"4294968148\" visible=\"true\" timestamp=\"2013-05-14T10:33:05Z\" version=\"1\" changeset=\"23123\" user=\"tyrTester06\" uid=\"1178\"><member type=\"way\" ref=\"4295032195\" role=\"line\"/><member type=\"node\" ref=\"4295668179\" role=\"point\"/><member type=\"node\" ref=\"4295668178\" role=\"\"/><member type=\"way\" ref=\"4295032194\" role=\"\"/><member type=\"way\" ref=\"4295032193\" role=\"\"/><member type=\"node\" ref=\"4295668174\" role=\"foo\"/><member type=\"node\" ref=\"4295668175\" role=\"bar\"/><tag k=\"type\" v=\"fancy\"/></relation><way id=\"4295032195\" visible=\"true\" timestamp=\"2013-05-14T10:33:05Z\" version=\"1\" changeset=\"23123\" user=\"tyrTester06\" uid=\"1178\"><nd ref=\"4295668174\"/><nd ref=\"4295668172\"/><nd ref=\"4295668171\"/><nd ref=\"4295668170\"/><nd ref=\"4295668173\"/><nd ref=\"4295668175\"/><tag k=\"highway\" v=\"residential\"/></way><way id=\"4295032194\" visible=\"true\" timestamp=\"2013-05-14T10:33:05Z\" version=\"1\" changeset=\"23123\" user=\"tyrTester06\" uid=\"1178\"><nd ref=\"4295668177\"/><nd ref=\"4295668178\"/><nd ref=\"4295668180\"/><tag k=\"highway\" v=\"service\"/></way><way id=\"4295032193\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\" version=\"1\" changeset=\"23123\" user=\"tyrTester06\" uid=\"1178\"><nd ref=\"4295668181\"/><nd ref=\"4295668178\"/><nd ref=\"4295668176\"/><tag k=\"highway\" v=\"service\"/></way><node id=\"4295668172\" version=\"1\" changeset=\"23123\" lat=\"46.4910906\" lon=\"11.2735763\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"><tag k=\"highway\" v=\"crossing\"/></node><node id=\"4295668173\" version=\"1\" changeset=\"23123\" lat=\"46.4911004\" lon=\"11.2759498\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"><tag k=\"created_by\" v=\"foo\"/></node><node id=\"4295668170\" version=\"1\" changeset=\"23123\" lat=\"46.4909732\" lon=\"11.2753813\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668171\" version=\"1\" changeset=\"23123\" lat=\"46.4909781\" lon=\"11.2743295\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668174\" version=\"1\" changeset=\"23123\" lat=\"46.4914820\" lon=\"11.2731001\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668175\" version=\"1\" changeset=\"23123\" lat=\"46.4915603\" lon=\"11.2765254\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668176\" version=\"1\" changeset=\"23123\" lat=\"46.4919468\" lon=\"11.2756726\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668177\" version=\"1\" changeset=\"23123\" lat=\"46.4919664\" lon=\"11.2753031\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668178\" version=\"1\" changeset=\"23123\" lat=\"46.4921083\" lon=\"11.2755021\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668179\" version=\"1\" changeset=\"23123\" lat=\"46.4921327\" lon=\"11.2742229\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668180\" version=\"1\" changeset=\"23123\" lat=\"46.4922893\" lon=\"11.2757152\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/><node id=\"4295668181\" version=\"1\" changeset=\"23123\" lat=\"46.4923235\" lon=\"11.2752747\" user=\"tyrTester06\" uid=\"1178\" visible=\"true\" timestamp=\"2013-05-14T10:33:04Z\"/></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/4295032195",
+       "properties": {
+        "type": "way",
+        "id": 4295032195,
+        "tags": {
+         "highway": "residential"
+        },
+        "relations": [
+         {
+          "role": "line",
+          "rel": "4294968148",
+          "reltags": {
+           "type": "fancy"
+          }
+         }
+        ],
+        "meta": {
+         "timestamp": "2013-05-14T10:33:05Z",
+         "version": "1",
+         "changeset": "23123",
+         "user": "tyrTester06",
+         "uid": "1178"
+        }
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          11.2731001,
+          46.491482
+         ],
+         [
+          11.2735763,
+          46.4910906
+         ],
+         [
+          11.2743295,
+          46.4909781
+         ],
+         [
+          11.2753813,
+          46.4909732
+         ],
+         [
+          11.2759498,
+          46.4911004
+         ],
+         [
+          11.2765254,
+          46.4915603
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/4295032194",
+       "properties": {
+        "type": "way",
+        "id": 4295032194,
+        "tags": {
+         "highway": "service"
+        },
+        "relations": [
+         {
+          "role": "",
+          "rel": "4294968148",
+          "reltags": {
+           "type": "fancy"
+          }
+         }
+        ],
+        "meta": {
+         "timestamp": "2013-05-14T10:33:05Z",
+         "version": "1",
+         "changeset": "23123",
+         "user": "tyrTester06",
+         "uid": "1178"
+        }
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          11.2753031,
+          46.4919664
+         ],
+         [
+          11.2755021,
+          46.4921083
+         ],
+         [
+          11.2757152,
+          46.4922893
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/4295032193",
+       "properties": {
+        "type": "way",
+        "id": 4295032193,
+        "tags": {
+         "highway": "service"
+        },
+        "relations": [
+         {
+          "role": "",
+          "rel": "4294968148",
+          "reltags": {
+           "type": "fancy"
+          }
+         }
+        ],
+        "meta": {
+         "timestamp": "2013-05-14T10:33:04Z",
+         "version": "1",
+         "changeset": "23123",
+         "user": "tyrTester06",
+         "uid": "1178"
+        }
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          11.2752747,
+          46.4923235
+         ],
+         [
+          11.2755021,
+          46.4921083
+         ],
+         [
+          11.2756726,
+          46.4919468
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/4295668172",
+       "properties": {
+        "type": "node",
+        "id": "4295668172",
+        "tags": {
+         "highway": "crossing"
+        },
+        "relations": [],
+        "meta": {
+         "timestamp": "2013-05-14T10:33:04Z",
+         "version": "1",
+         "changeset": "23123",
+         "user": "tyrTester06",
+         "uid": "1178"
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         11.2735763,
+         46.4910906
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/4295668174",
+       "properties": {
+        "type": "node",
+        "id": "4295668174",
+        "tags": {},
+        "relations": [
+         {
+          "role": "foo",
+          "rel": "4294968148",
+          "reltags": {
+           "type": "fancy"
+          }
+         }
+        ],
+        "meta": {
+         "timestamp": "2013-05-14T10:33:04Z",
+         "version": "1",
+         "changeset": "23123",
+         "user": "tyrTester06",
+         "uid": "1178"
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         11.2731001,
+         46.491482
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/4295668175",
+       "properties": {
+        "type": "node",
+        "id": "4295668175",
+        "tags": {},
+        "relations": [
+         {
+          "role": "bar",
+          "rel": "4294968148",
+          "reltags": {
+           "type": "fancy"
+          }
+         }
+        ],
+        "meta": {
+         "timestamp": "2013-05-14T10:33:04Z",
+         "version": "1",
+         "changeset": "23123",
+         "user": "tyrTester06",
+         "uid": "1178"
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         11.2765254,
+         46.4915603
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/4295668178",
+       "properties": {
+        "type": "node",
+        "id": "4295668178",
+        "tags": {},
+        "relations": [
+         {
+          "role": "",
+          "rel": "4294968148",
+          "reltags": {
+           "type": "fancy"
+          }
+         }
+        ],
+        "meta": {
+         "timestamp": "2013-05-14T10:33:04Z",
+         "version": "1",
+         "changeset": "23123",
+         "user": "tyrTester06",
+         "uid": "1178"
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         11.2755021,
+         46.4921083
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/4295668179",
+       "properties": {
+        "type": "node",
+        "id": "4295668179",
+        "tags": {},
+        "relations": [
+         {
+          "role": "point",
+          "rel": "4294968148",
+          "reltags": {
+           "type": "fancy"
+          }
+         }
+        ],
+        "meta": {
+         "timestamp": "2013-05-14T10:33:04Z",
+         "version": "1",
+         "changeset": "23123",
+         "user": "tyrTester06",
+         "uid": "1178"
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         11.2742229,
+         46.4921327
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "defaults / polygon detection",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "tags": {
+        "foo": "bar",
+        "area": "yes"
+       },
+       "nodes": [
+        1,
+        2,
+        3,
+        1
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "tags": {
+        "area": "yes"
+       },
+       "nodes": [
+        1,
+        2,
+        3
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 3
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "foo": "bar",
+         "area": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           1
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          0,
+          1
+         ],
+         [
+          0,
+          2
+         ],
+         [
+          3,
+          0
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "tags": {
+        "area": "no",
+        "building": "yes"
+       },
+       "nodes": [
+        1,
+        2,
+        3,
+        1
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 3
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "area": "no",
+         "building": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          0,
+          1
+         ],
+         [
+          0,
+          2
+         ],
+         [
+          3,
+          0
+         ],
+         [
+          0,
+          1
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "tainted data / tainted geometries",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 10,
+       "nodes": [
+        2,
+        3,
+        5
+       ]
+      },
+      {
+       "type": "way",
+       "id": 11,
+       "nodes": [
+        2,
+        3,
+        4,
+        5,
+        2
+       ],
+       "tags": {
+        "area": "yes"
+       }
+      },
+      {
+       "type": "way",
+       "id": 12,
+       "nodes": [
+        2,
+        3,
+        4,
+        2
+       ]
+      },
+      {
+       "type": "relation",
+       "id": 100,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 12,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 13,
+         "role": "inner"
+        }
+       ]
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 1,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 1,
+       "lon": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/12",
+       "properties": {
+        "type": "way",
+        "id": 12,
+        "tags": {},
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 100,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/11",
+       "properties": {
+        "type": "way",
+        "id": 11,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/10",
+       "properties": {
+        "type": "way",
+        "id": 10,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          0,
+          1
+         ],
+         [
+          1,
+          0
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "tainted data / ids_only (missing coordinates or references)",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "node",
+       "id": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "tainted data / tainted way",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        2,
+        3,
+        4
+       ]
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 1,
+       "lon": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "tainted data / tainted simple multipolygon",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "inner"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        3,
+        4,
+        5,
+        3
+       ]
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 1,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {},
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        3,
+        4,
+        5,
+        3
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        3,
+        4,
+        5,
+        6,
+        3
+       ]
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 1,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {},
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon"
+          }
+         }
+        ],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "tainted data / tainted multipolygon",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        4
+       ]
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        7,
+        4
+       ]
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        4,
+        5,
+        6,
+        4
+       ]
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 0,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 6,
+       "lat": 1,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+         [
+          [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            0
+           ],
+           [
+            0,
+            1
+           ],
+           [
+            0,
+            0
+           ]
+          ]
+         ],
+         [
+          [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            0
+           ],
+           [
+            0,
+            1
+           ],
+           [
+            0,
+            0
+           ]
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "tainted data / degenerate multipolygon",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6
+       ]
+      },
+      {
+       "type": "way",
+       "id": 3,
+       "nodes": [
+        6,
+        4
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "inner"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        3,
+        4,
+        5,
+        3
+       ]
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 1,
+       "lon": 0
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "tags": {
+        "type": "multipolygon"
+       },
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer"
+        }
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        4,
+        5,
+        6,
+        4
+       ]
+      },
+      {
+       "type": "node",
+       "id": 4,
+       "lat": 0,
+       "lon": 0
+      },
+      {
+       "type": "node",
+       "id": 5,
+       "lat": 1,
+       "lon": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": []
+    }
+   }
+  ]
+ },
+ {
+  "name": "other / sideeffects",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "node",
+       "id": 1,
+       "tags": {
+        "foo": "bar"
+       },
+       "user": "johndoe",
+       "lat": 1.234,
+       "lon": 4.321
+      },
+      {
+       "type": "node",
+       "id": 2
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2,
+        3
+       ]
+      },
+      {
+       "type": "relation",
+       "id": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 1
+        },
+        {
+         "type": "way",
+         "ref": 2
+        },
+        {
+         "type": "node",
+         "ref": 1
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [
+         {
+          "rel": 1
+         }
+        ],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          4.321,
+          1.234
+         ],
+         [
+          null,
+          null
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": 1,
+        "tags": {
+         "foo": "bar"
+        },
+        "relations": [
+         {
+          "rel": 1
+         }
+        ],
+        "meta": {
+         "user": "johndoe"
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / center (xml)",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm><way id='1'><center lat='1.234' lon='4.321' /></way></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": "1",
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "geometry": "center"
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "xml",
+    "input": "<osm><relation id='1'><center lat='1.234' lon='4.321' /></relation></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": "1",
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "geometry": "center"
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / center (json)",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "center": {
+        "lat": 1.234,
+        "lon": 4.321
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "geometry": "center"
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "center": {
+        "lat": 1.234,
+        "lon": 4.321
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "geometry": "center"
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         4.321,
+         1.234
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / bounds (xml)",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm><way id='1'><bounds minlat='1.234' minlon='4.321' maxlat='2.234' maxlon='5.321'/></way></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "geometry": "bounds"
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           4.321,
+           1.234
+          ],
+          [
+           5.321,
+           1.234
+          ],
+          [
+           5.321,
+           2.234
+          ],
+          [
+           4.321,
+           2.234
+          ],
+          [
+           4.321,
+           1.234
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "xml",
+    "input": "<osm><relation id='1'><bounds minlat='1.234' minlon='4.321' maxlat='2.234' maxlon='5.321'/></relation></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "geometry": "bounds"
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           4.321,
+           1.234
+          ],
+          [
+           5.321,
+           1.234
+          ],
+          [
+           5.321,
+           2.234
+          ],
+          [
+           4.321,
+           2.234
+          ],
+          [
+           4.321,
+           1.234
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / bounds (json)",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "bounds": {
+        "minlat": 1.234,
+        "minlon": 4.321,
+        "maxlat": 2.234,
+        "maxlon": 5.321
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "geometry": "bounds"
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           4.321,
+           1.234
+          ],
+          [
+           5.321,
+           1.234
+          ],
+          [
+           5.321,
+           2.234
+          ],
+          [
+           4.321,
+           2.234
+          ],
+          [
+           4.321,
+           1.234
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "bounds": {
+        "minlat": 1.234,
+        "minlon": 4.321,
+        "maxlat": 2.234,
+        "maxlon": 5.321
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "geometry": "bounds"
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           4.321,
+           1.234
+          ],
+          [
+           5.321,
+           1.234
+          ],
+          [
+           5.321,
+           2.234
+          ],
+          [
+           4.321,
+           2.234
+          ],
+          [
+           4.321,
+           1.234
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / full (xml)",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm><way id='1'><bounds minlat='0' minlon='0' maxlat='1' maxlon='1'/><nd ref='1' lat='0' lon='0' /><nd ref='2' lat='0' lon='1' /><nd ref='3' lat='1' lon='1' /><nd ref='1' lat='0' lon='0' /><tag k='area' v='yes' /></way></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "xml",
+    "input": "<osm><way id='1'><bounds minlat='0' minlon='0' maxlat='1' maxlon='1'/><nd lat='0' lon='0' /><nd lat='0' lon='1' /><nd lat='1' lon='1' /><nd lat='0' lon='0' /><tag k='area' v='yes' /></way></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "xml",
+    "input": "<osm><relation id='1'><bounds minlat='0' minlon='0' maxlat='1' maxlon='1'/><member type='way' ref='1' role='outer'><nd lat='0' lon='0' /><nd lat='0' lon='1' /><nd lat='1' lon='1' /><nd lat='1' lon='0' /><nd lat='0' lon='0' /></member><member type='way' ref='2' role='outer'><nd lat='1.1' lon='1.1' /><nd lat='1.1' lon='1.2' /><nd lat='1.2' lon='1.2' /><nd lat='1.1' lon='1.1' /></member><member type='node' ref='1' role='admin_centre' lat='0.5' lon='0.5'/><tag k='type' v='boundary' /></relation></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "boundary"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+         [
+          [
+           [
+            1.1,
+            1.1
+           ],
+           [
+            1.2,
+            1.1
+           ],
+           [
+            1.2,
+            1.2
+           ],
+           [
+            1.1,
+            1.1
+           ]
+          ]
+         ],
+         [
+          [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            0
+           ],
+           [
+            1,
+            1
+           ],
+           [
+            0,
+            1
+           ],
+           [
+            0,
+            0
+           ]
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": "1",
+        "tags": {},
+        "relations": [
+         {
+          "role": "admin_centre",
+          "rel": "1",
+          "reltags": {
+           "type": "boundary"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         0.5,
+         0.5
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "xml",
+    "input": "<osm><relation id='1'><member type='way' ref='1' role='outer'><nd lat='0' lon='0' /><nd lat='0' lon='1' /></member><member type='way' ref='2' role='outer'><nd lat='0' lon='1' /><nd lat='1' lon='1' /></member><member type='way' ref='3' role='outer'><nd lat='1' lon='1' /><nd lat='0' lon='0' /></member><tag k='type' v='multipolygon' /></relation><relation id='2'><member type='way' ref='4' role='outer'><nd lat='0' lon='0' /><nd lat='1' lon='0' /></member><member type='way' ref='5' role='outer'><nd lat='1' lon='0' /><nd lat='1' lon='1' /></member><member type='way' ref='3' role='outer'><nd lat='1' lon='1' /><nd lat='0' lon='0' /></member><tag k='type' v='multipolygon' /></relation></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "relation/2",
+       "properties": {
+        "type": "relation",
+        "id": 2,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / full (json)",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "bounds": {
+        "minlat": 0,
+        "minlon": 0,
+        "maxlat": 1,
+        "maxlon": 1
+       },
+       "nodes": [
+        1,
+        2,
+        3,
+        1
+       ],
+       "geometry": [
+        {
+         "lat": 0,
+         "lon": 0
+        },
+        {
+         "lat": 0,
+         "lon": 1
+        },
+        {
+         "lat": 1,
+         "lon": 1
+        },
+        {
+         "lat": 0,
+         "lon": 0
+        }
+       ],
+       "tags": {
+        "area": "yes"
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "bounds": {
+        "minlat": 0,
+        "minlon": 0,
+        "maxlat": 1,
+        "maxlon": 1
+       },
+       "geometry": [
+        {
+         "lat": 0,
+         "lon": 0
+        },
+        {
+         "lat": 0,
+         "lon": 1
+        },
+        {
+         "lat": 1,
+         "lon": 1
+        },
+        {
+         "lat": 0,
+         "lon": 0
+        }
+       ],
+       "tags": {
+        "area": "yes"
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "area": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "boundary"
+       },
+       "bounds": {
+        "minlat": 0,
+        "minlon": 0,
+        "maxlat": 1,
+        "maxlon": 1
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 0,
+           "lon": 0
+          },
+          {
+           "lat": 0,
+           "lon": 1
+          },
+          {
+           "lat": 1,
+           "lon": 1
+          },
+          {
+           "lat": 1,
+           "lon": 0
+          },
+          {
+           "lat": 0,
+           "lon": 0
+          }
+         ]
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 1.1,
+           "lon": 1.1
+          },
+          {
+           "lat": 1.1,
+           "lon": 1.2
+          },
+          {
+           "lat": 1.2,
+           "lon": 1.2
+          },
+          {
+           "lat": 1.1,
+           "lon": 1.1
+          }
+         ]
+        },
+        {
+         "type": "node",
+         "ref": 1,
+         "role": "admin_centre",
+         "lat": 0.5,
+         "lon": 0.5
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "boundary"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+         [
+          [
+           [
+            1.1,
+            1.1
+           ],
+           [
+            1.2,
+            1.1
+           ],
+           [
+            1.2,
+            1.2
+           ],
+           [
+            1.1,
+            1.1
+           ]
+          ]
+         ],
+         [
+          [
+           [
+            0,
+            0
+           ],
+           [
+            1,
+            0
+           ],
+           [
+            1,
+            1
+           ],
+           [
+            0,
+            1
+           ],
+           [
+            0,
+            0
+           ]
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": 1,
+        "tags": {},
+        "relations": [
+         {
+          "role": "admin_centre",
+          "rel": 1,
+          "reltags": {
+           "type": "boundary"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         0.5,
+         0.5
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 0,
+           "lon": 0
+          },
+          {
+           "lat": 0,
+           "lon": 1
+          }
+         ]
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 0,
+           "lon": 1
+          },
+          {
+           "lat": 1,
+           "lon": 1
+          }
+         ]
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 1,
+           "lon": 1
+          },
+          {
+           "lat": 0,
+           "lon": 0
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "relation",
+       "id": 2,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 4,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 0,
+           "lon": 0
+          },
+          {
+           "lat": 1,
+           "lon": 0
+          }
+         ]
+        },
+        {
+         "type": "way",
+         "ref": 5,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 1,
+           "lon": 0
+          },
+          {
+           "lat": 1,
+           "lon": 1
+          }
+         ]
+        },
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 1,
+           "lon": 1
+          },
+          {
+           "lat": 0,
+           "lon": 0
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "relation/2",
+       "properties": {
+        "type": "relation",
+        "id": 2,
+        "tags": {
+         "type": "multipolygon"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / full, mixed content (xml)",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm><way id='1'><nd ref='1' lat='0' lon='0' /><nd ref='2' lat='1' lon='1' /><nd ref='3' lat='2' lon='2' /></way><node id='2' lat='1' lon='1'><tag k='foo' v='bar' /></node></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/2",
+       "properties": {
+        "type": "node",
+        "id": "2",
+        "tags": {
+         "foo": "bar"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / full, mixed content (json)",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2,
+        3
+       ],
+       "geometry": [
+        {
+         "lat": 0,
+         "lon": 0
+        },
+        {
+         "lat": 1,
+         "lon": 1
+        },
+        {
+         "lat": 2,
+         "lon": 2
+        }
+       ]
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 1,
+       "lon": 1,
+       "tags": {
+        "foo": "bar"
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "node/2",
+       "properties": {
+        "type": "node",
+        "id": 2,
+        "tags": {
+         "foo": "bar"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / full, tainted (xml)",
+  "calls": [
+   {
+    "input_type": "xml",
+    "input": "<osm><way id='1'><nd ref='1' /><nd ref='2' lat='1' lon='1' /><nd ref='3' lat='2' lon='2' /><nd ref='4' /></way></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "xml",
+    "input": "<osm><way id='1'><nd /><nd lat='1' lon='1' /><nd lat='2' lon='2' /><nd /></way></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "xml",
+    "input": "<osm><relation id='1'><member type='way' ref='1' role='outer'><nd lat='0' lon='0' /><nd lat='0' lon='1' /><nd lat='1' lon='1' /><nd lat='1' lon='0' /><nd lat='0' lon='0' /></member><member type='way' ref='2' role='inner' /><tag k='type' v='multipolygon' /></relation><relation id='2'><member type='way' ref='3' role='outer'><nd lat='1' lon='1' /><nd lat='1' lon='2' /><nd lat='2' lon='2' /><nd /><nd lat='1' lon='1' /></member><tag k='type' v='multipolygon' /></relation></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/3",
+       "properties": {
+        "type": "way",
+        "id": 3,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           1,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           2
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / full, tainted (json)",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2,
+        3,
+        4
+       ],
+       "geometry": [
+        null,
+        {
+         "lat": 1,
+         "lon": 2
+        },
+        {
+         "lat": 2,
+         "lon": 2
+        },
+        null
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          2,
+          1
+         ],
+         [
+          2,
+          2
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "geometry": [
+        null,
+        {
+         "lat": 1,
+         "lon": 2
+        },
+        {
+         "lat": 2,
+         "lon": 2
+        },
+        null
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          2,
+          1
+         ],
+         [
+          2,
+          2
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 0,
+           "lon": 0
+          },
+          {
+           "lat": 0,
+           "lon": 1
+          },
+          {
+           "lat": 1,
+           "lon": 1
+          },
+          {
+           "lat": 1,
+           "lon": 0
+          },
+          {
+           "lat": 0,
+           "lon": 0
+          }
+         ]
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "inner",
+         "geometry": null
+        }
+       ]
+      },
+      {
+       "type": "relation",
+       "id": 2,
+       "tags": {
+        "type": "multipolygon"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 3,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 1,
+           "lon": 1
+          },
+          {
+           "lat": 1,
+           "lon": 2
+          },
+          {
+           "lat": 2,
+           "lon": 2
+          },
+          null,
+          {
+           "lat": 1,
+           "lon": 1
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/3",
+       "properties": {
+        "type": "way",
+        "id": 3,
+        "tags": {},
+        "relations": [],
+        "meta": {},
+        "tainted": true
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           1,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           2
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "overpass geometry types / nested / mixed content",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 2,
+       "tags": {
+        "building": "yes"
+       },
+       "nodes": [
+        1,
+        2,
+        3
+       ],
+       "geometry": [
+        {
+         "lat": 2,
+         "lon": 2
+        },
+        {
+         "lat": 1,
+         "lon": 0
+        },
+        {
+         "lat": 0,
+         "lon": 0
+        }
+       ]
+      },
+      {
+       "type": "relation",
+       "id": 1,
+       "tags": {
+        "type": "multipolygon",
+        "building": "yes"
+       },
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 0,
+           "lon": 0
+          },
+          {
+           "lat": 0,
+           "lon": 1
+          },
+          {
+           "lat": 1,
+           "lon": 1
+          },
+          {
+           "lat": 2,
+           "lon": 2
+          }
+         ]
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer",
+         "geometry": [
+          {
+           "lat": 2,
+           "lon": 2
+          },
+          {
+           "lat": 1,
+           "lon": 0
+          },
+          {
+           "lat": 0,
+           "lon": 0
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon",
+         "building": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           2,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           2,
+           2
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {
+         "building": "yes"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "building": "yes"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          2,
+          2
+         ],
+         [
+          0,
+          1
+         ],
+         [
+          0,
+          0
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   {
+    "input_type": "xml",
+    "input": "<osm><relation id='1'><member type='way' ref='1' role='outer'><nd lat='0' lon='0' /><nd lat='0' lon='1' /><nd lat='1' lon='1' /><nd lat='2' lon='2' /></member><member type='way' ref='2' role='outer'><nd lat='2' lon='2' /><nd lat='1' lon='0' /><nd lat='0' lon='0' /></member><tag k='type' v='multipolygon' /><tag k='building' v='yes' /></relation><way id='2'><nd ref='1' lat='2' lon='2' /><nd ref='2' lat='1' lon='0' /><nd ref='3' lat='0' lon='0' /><tag k='building' v='yes' /></way></osm>",
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon",
+         "building": "yes"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           2,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           2,
+           2
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {
+         "building": "yes"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": "1",
+          "reltags": {
+           "type": "multipolygon",
+           "building": "yes"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          2,
+          2
+         ],
+         [
+          0,
+          1
+         ],
+         [
+          0,
+          0
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "duplicate elements / node",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 1,
+       "tags": {
+        "foo": "bar",
+        "dupe": "x"
+       }
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 1,
+       "tags": {
+        "asd": "fasd",
+        "dupe": "y"
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": 1,
+        "tags": {
+         "asd": "fasd",
+         "dupe": "x",
+         "foo": "bar"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "duplicate elements / node, different version",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "node",
+       "id": 1,
+       "version": 2,
+       "lat": 1,
+       "lon": 1,
+       "tags": {
+        "foo": "bar",
+        "dupe": "x"
+       }
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "version": 1,
+       "lat": 1,
+       "lon": 1,
+       "tags": {
+        "asd": "fasd",
+        "dupe": "y"
+       }
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "node/1",
+       "properties": {
+        "type": "node",
+        "id": 1,
+        "tags": {
+         "foo": "bar",
+         "dupe": "x"
+        },
+        "relations": [],
+        "meta": {
+         "version": 2
+        }
+       },
+       "geometry": {
+        "type": "Point",
+        "coordinates": [
+         1,
+         1
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "duplicate elements / way",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2
+       ],
+       "tags": {
+        "foo": "bar",
+        "dupe": "x"
+       }
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 2
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "foo": "bar",
+         "dupe": "x"
+        },
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "duplicate elements / way, different versions",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "way",
+       "id": 1,
+       "version": 1,
+       "nodes": [
+        1,
+        2
+       ],
+       "tags": {
+        "foo": "bar",
+        "dupe": "x"
+       }
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "version": 2,
+       "nodes": [
+        1,
+        2,
+        3
+       ],
+       "tags": {
+        "asd": "fasd",
+        "dupe": "y"
+       }
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 2
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 3,
+       "lon": 3
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "asd": "fasd",
+         "dupe": "y"
+        },
+        "relations": [],
+        "meta": {
+         "version": 2
+        }
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ],
+         [
+          3,
+          3
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "duplicate elements / relation",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "version": 2,
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        }
+       ],
+       "tags": {
+        "type": "multipolygon",
+        "foo": "2"
+       }
+      },
+      {
+       "type": "relation",
+       "id": 1,
+       "version": 1,
+       "members": [
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ],
+       "tags": {
+        "type": "multipolygon",
+        "foo": "1"
+       }
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2,
+        3,
+        1
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        1,
+        2,
+        3,
+        1
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 2
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 2,
+       "lon": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon",
+         "foo": "2"
+        },
+        "relations": [],
+        "meta": {
+         "version": 2
+        }
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           1,
+           1
+          ],
+          [
+           2,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           1
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/2",
+       "properties": {
+        "type": "way",
+        "id": 2,
+        "tags": {},
+        "relations": [],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ],
+         [
+          1,
+          2
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "name": "duplicate elements / relation, additional skeleton ways",
+  "calls": [
+   {
+    "input_type": "json",
+    "input": {
+     "elements": [
+      {
+       "type": "relation",
+       "id": 1,
+       "version": 2,
+       "members": [
+        {
+         "type": "way",
+         "ref": 1,
+         "role": "outer"
+        },
+        {
+         "type": "way",
+         "ref": 2,
+         "role": "outer"
+        }
+       ],
+       "tags": {
+        "type": "multipolygon",
+        "foo": "bar"
+       }
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2,
+        3
+       ],
+       "tags": {
+        "asd": "fasd"
+       }
+      },
+      {
+       "type": "way",
+       "id": 1,
+       "nodes": [
+        1,
+        2,
+        3
+       ]
+      },
+      {
+       "type": "way",
+       "id": 2,
+       "nodes": [
+        3,
+        1
+       ]
+      },
+      {
+       "type": "node",
+       "id": 1,
+       "lat": 1,
+       "lon": 1
+      },
+      {
+       "type": "node",
+       "id": 2,
+       "lat": 2,
+       "lon": 2
+      },
+      {
+       "type": "node",
+       "id": 3,
+       "lat": 2,
+       "lon": 1
+      }
+     ]
+    },
+    "output": {
+     "type": "FeatureCollection",
+     "features": [
+      {
+       "type": "Feature",
+       "id": "relation/1",
+       "properties": {
+        "type": "relation",
+        "id": 1,
+        "tags": {
+         "type": "multipolygon",
+         "foo": "bar"
+        },
+        "relations": [],
+        "meta": {
+         "version": 2
+        }
+       },
+       "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+         [
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           1
+          ],
+          [
+           2,
+           2
+          ],
+          [
+           1,
+           2
+          ]
+         ]
+        ]
+       }
+      },
+      {
+       "type": "Feature",
+       "id": "way/1",
+       "properties": {
+        "type": "way",
+        "id": 1,
+        "tags": {
+         "asd": "fasd"
+        },
+        "relations": [
+         {
+          "role": "outer",
+          "rel": 1,
+          "reltags": {
+           "type": "multipolygon",
+           "foo": "bar"
+          }
+         }
+        ],
+        "meta": {}
+       },
+       "geometry": {
+        "type": "LineString",
+        "coordinates": [
+         [
+          1,
+          1
+         ],
+         [
+          2,
+          2
+         ],
+         [
+          1,
+          2
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+]

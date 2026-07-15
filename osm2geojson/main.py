@@ -144,11 +144,40 @@ def _json2shapes(
     logger.setLevel(log_level)
     shapes = []
 
-    refs = [el for el in data["elements"] if el["type"] in ["node", "way", "relation"]]
+    elements = deduplicate_elements(data["elements"])
+
+    refs = [el for el in elements if el["type"] in ["node", "way", "relation"]]
 
     refs_index = build_refs_index(refs)
 
-    for el in data["elements"]:
+    # Elements directly referenced by a relation are features in their own right
+    # (e.g. an admin_centre node) even when they also serve as way vertices.
+    # Node members that only exist inline ("out geom" responses) are synthesized
+    # into standalone elements so they show up as Point features.
+    synthesized = []
+    for el in refs:
+        if el["type"] == "relation":
+            for member in el.get("members", []):
+                found = get_ref(member, refs_index, silent=True)
+                if found is not None:
+                    found["_relation_member"] = True
+                elif member["type"] == "node" and "lat" in member and "lon" in member:
+                    node = {
+                        "type": "node",
+                        "id": member["ref"],
+                        "lat": member["lat"],
+                        "lon": member["lon"],
+                        "_relation_member": True,
+                    }
+                    if member.get("tags"):
+                        node["tags"] = member["tags"]
+                    synthesized.append(node)
+    for node in synthesized:
+        elements.append(node)
+        refs.append(node)
+        refs_index[get_ref_name(node)] = node
+
+    for el in elements:
         shape = element_to_shape(
             el, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
         )
@@ -174,7 +203,10 @@ def _json2shapes(
     for shape in shapes:
         if "properties" not in shape:
             warning("Shape without props", pformat(shape))
-        if (shape["properties"].get("type"), shape["properties"].get("id")) in used:
+        if not shape.get("keep") and (
+            shape["properties"].get("type"),
+            shape["properties"].get("id"),
+        ) in used:
             continue
         filtered_shapes.append(shape)
 
@@ -230,6 +262,32 @@ def build_refs_index(elements):
     return {get_ref_name(el): el for el in elements}
 
 
+def deduplicate_elements(elements):
+    # Overpass unions (e.g. "way(...); >;") can return the same element twice,
+    # sometimes as a skeleton. Keep the newest / most complete version.
+    best = {}
+    order = []
+    for el in elements:
+        if "type" not in el or "id" not in el:
+            key = ("__no_id__", len(order))
+        else:
+            key = (el["type"], el["id"])
+        if key not in best:
+            order.append(key)
+            best[key] = el
+        else:
+            winner, loser = el, best[key]
+            if (el.get("version", 0), len(el)) <= (best[key].get("version", 0), len(best[key])):
+                winner, loser = best[key], el
+            if winner.get("version") == loser.get("version"):
+                # same version seen twice (e.g. overlapping queries) - merge the tags
+                merged_tags = {**(loser.get("tags") or {}), **(winner.get("tags") or {})}
+                if merged_tags:
+                    winner = {**winner, "tags": merged_tags}
+            best[key] = winner
+    return [best[key] for key in order]
+
+
 # Tag keys that don't make an element a feature in its own right
 # (same blacklist as osmtogeojson)
 UNINTERESTING_TAGS = {
@@ -250,14 +308,29 @@ def has_interesting_tags(tags, ignore_tags=None):
     for key, value in (tags or {}).items():
         if key in UNINTERESTING_TAGS:
             continue
-        if key in ignore_tags and ignore_tags[key] == value:
+        if key in ignore_tags and (ignore_tags[key] is True or ignore_tags[key] == value):
             continue
         return True
     return False
 
 
 def node_to_shape(node):
+    if "lon" not in node or "lat" not in node:
+        logger.debug("Node without coordinates: %s", node.get("id"))
+        return None
     return {"shape": Point(node["lon"], node["lat"]), "properties": get_element_props(node)}
+
+
+def bounds_to_shape(bounds):
+    return Polygon(
+        [
+            [bounds["minlon"], bounds["minlat"]],
+            [bounds["maxlon"], bounds["minlat"]],
+            [bounds["maxlon"], bounds["maxlat"]],
+            [bounds["minlon"], bounds["maxlat"]],
+            [bounds["minlon"], bounds["minlat"]],
+        ]
+    )
 
 
 def get_element_props(el, keys: list = None):
@@ -309,15 +382,28 @@ def way_to_shape(
         center = way["center"]
         return {"shape": Point(center["lon"], center["lat"]), "properties": get_element_props(way)}
 
-    if "geometry" in way and len(way["geometry"]) > 0:
-        coords = [[nd["lon"], nd["lat"]] for nd in way["geometry"]]
+    if way.get("geometry"):
+        # tolerate null/empty vertices (tainted "out geom" data) — build partial geometry
+        coords = [
+            [nd["lon"], nd["lat"]]
+            for nd in way["geometry"]
+            if nd is not None and "lon" in nd and "lat" in nd
+        ]
 
     elif "nodes" in way and len(way["nodes"]) > 0:
         coords = []
         for ref in way["nodes"]:
             node = get_node_ref(ref, refs_index)
+            if node is not None and "lon" not in node:
+                # skeleton node (e.g. "out ids") - no geometry to contribute
+                node = None
             if node:
-                node["used"] = way["id"]
+                # nodes with own interesting tags (POIs) or referenced by relations
+                # stay separate features
+                if not has_interesting_tags(node.get("tags")) and not node.get(
+                    "_relation_member"
+                ):
+                    node["used"] = way["id"]
                 coords.append([node["lon"], node["lat"]])
             else:
                 message = get_message(
@@ -326,7 +412,7 @@ def way_to_shape(
                 warning(message)
                 if raise_on_failure:
                     raise Exception(message)
-                return None
+                # build partial geometry from the nodes we do have
 
     elif "ref" in way:
         # Try to get ref silently first (common in incomplete relation data)
@@ -341,14 +427,9 @@ def way_to_shape(
                 raise Exception(message)
             return None
 
-        if "id" in way:
-            ref["used"] = way["id"]
-        elif "used" in way:
-            ref["used"] = way["used"]
-        else:
-            # filter will not work for this situation
-            warning("Failed to mark ref as used", pformat(ref), "for way", pformat(way))
-            # do we need to raise expection here? I don't think so
+        used_by = way.get("id", way.get("used"))
+        if used_by is not None and not has_interesting_tags(ref.get("tags")):
+            ref["used"] = used_by
         ref_way = way_to_shape(
             ref, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
         )
@@ -362,6 +443,10 @@ def way_to_shape(
             ref_way["shape"].exterior if isinstance(ref_way["shape"], Polygon) else ref_way["shape"]
         ).coords
 
+    elif "bounds" in way:
+        # "out bb" responses carry only a bounding box
+        return {"shape": bounds_to_shape(way["bounds"]), "properties": get_element_props(way)}
+
     else:
         # throw exception
         message = get_message("Relation has way without nodes", pformat(way))
@@ -371,6 +456,8 @@ def way_to_shape(
         return None
 
     if len(coords) < 2:
+        if "bounds" in way:
+            return {"shape": bounds_to_shape(way["bounds"]), "properties": get_element_props(way)}
         message = get_message("Not found coords for way", pformat(way))
         warning(message)
         if raise_on_failure:
@@ -402,6 +489,8 @@ def is_exception(node, area_keys: Optional[dict] = None):
 
 
 def is_same_coords(a, b):
+    if a is None or b is None:
+        return False
     return a["lat"] == b["lat"] and a["lon"] == b["lon"]
 
 
@@ -415,20 +504,18 @@ def is_geometry_polygon(
     if "area" in tags and tags["area"] == "no":
         return False
 
+    # An unclosed way is never a polygon, whatever its tags say
+    # (also covers issue #7 and barrier=wall)
+    if "geometry" in node and not is_same_coords(node["geometry"][0], node["geometry"][-1]):
+        return False
+    if "nodes" in node and node["nodes"][0] != node["nodes"][-1]:
+        return False
+
     if "area" in tags and tags["area"] == "yes":
         return True
 
-    if "type" in tags and tags["type"] == "multipolygon":
+    if "type" in tags and tags["type"] in ("multipolygon", "boundary"):
         return True
-
-    # Fix for issue #7, but should be handled by id-area-keys or osm-polygon-features
-    # For example https://github.com/tyrasd/osm-polygon-features/issues/5
-    if "geometry" in node and not is_same_coords(node["geometry"][0], node["geometry"][-1]):
-        return False
-
-    # For issue #7 and situation with barrier=wall
-    if "nodes" in node and node["nodes"][0] != node["nodes"][-1]:
-        return False
 
     is_polygon = is_geometry_polygon_without_exceptions(node, polygon_features)
     if is_polygon:
@@ -509,17 +596,24 @@ def relation_to_shape(
         center = rel["center"]
         return {"shape": Point(center["lon"], center["lat"]), "properties": get_element_props(rel)}
 
+    shape = None
     try:
         if is_geometry_polygon(rel, area_keys, polygon_features):
-            return multipolygon_relation_to_shape(
+            shape = multipolygon_relation_to_shape(
                 rel, refs_index, raise_on_failure=raise_on_failure
             )
-        return multiline_realation_to_shape(rel, refs_index, raise_on_failure=raise_on_failure)
+        else:
+            shape = multiline_realation_to_shape(rel, refs_index, raise_on_failure=raise_on_failure)
     except Exception as e:
         message = get_message("Failed to convert relation to shape: \n", pformat(e), pformat(rel))
         error(message)
         if raise_on_failure:
             raise Exception(message)
+
+    if shape is None and "bounds" in rel:
+        # "out bb" responses carry only a bounding box
+        return {"shape": bounds_to_shape(rel["bounds"]), "properties": get_element_props(rel)}
+    return shape
 
 
 def multiline_realation_to_shape(
@@ -545,15 +639,24 @@ def multiline_realation_to_shape(
             return None
         members = found_ref["members"]
 
+    rel_id = rel.get("id", rel.get("ref"))
+    rel_type = (rel.get("tags") or {}).get("type")
+
     for member in members:
         if member["type"] == "way":
+            # for linear relation types, members without own interesting tags are
+            # represented by the relation itself (same rule as osmtogeojson)
+            if rel_type in ("route", "waterway"):
+                found_way = get_ref(member, refs_index, silent=True)
+                if found_way is not None and not has_interesting_tags(found_way.get("tags")):
+                    found_way["used"] = rel_id
             way_shape = way_to_shape(
                 member, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
             )
         elif member["type"] == "relation":
             found_member = get_ref(member, refs_index, silent=True)
-            if found_member:
-                found_member["used"] = rel["id"]
+            if found_member is not None and not has_interesting_tags(found_member.get("tags")):
+                found_member["used"] = rel_id
             way_shape = element_to_shape(
                 member, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
             )
@@ -620,6 +723,8 @@ def multipolygon_relation_to_shape(
             return None
         members = found_ref["members"]
 
+    rel_id = rel.get("id", rel.get("ref"))
+
     for member in members:
         if member["type"] != "way":
             non_way_members.append(member)
@@ -633,7 +738,7 @@ def multipolygon_relation_to_shape(
                 raise Exception(message)
             continue
 
-        member["used"] = rel["id"]
+        member["used"] = rel_id
 
         # When member ways are also returned as separate elements (e.g. "rel(ID); way(r);
         # out geom;"), members carry inline geometry and way_to_shape never touches the
@@ -644,11 +749,14 @@ def multipolygon_relation_to_shape(
         # geometry keep their own tags meaningful.
         found_way = get_ref(member, refs_index, silent=True)
         if found_way is not None:
+            # For ref-resolved outer ways the relation's tags don't count as interesting
+            # (old-style multipolygon tagging) - same rule as osmtogeojson. Members with
+            # inline geometry keep their own tags meaningful.
             ignore_tags = None
             if member.get("role") == "outer" and "geometry" not in member:
                 ignore_tags = rel.get("tags")
             if not has_interesting_tags(found_way.get("tags"), ignore_tags):
-                found_way["used"] = rel["id"]
+                found_way["used"] = rel_id
 
         way_shape = way_to_shape(
             member, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
@@ -693,6 +801,27 @@ def multipolygon_relation_to_shape(
             raise Exception(message)
         return None
 
+    # Old-style multipolygon (tags on the outer way, relation carries only type=...):
+    # attribute the feature to the outer way, like osmtogeojson does
+    outer_members = [m for m in members if m.get("role", "outer") in ("outer", "")]
+    if len(outer_members) == 1 and not has_interesting_tags(rel.get("tags"), {"type": True}):
+        found_way = get_ref(outer_members[0], refs_index, silent=True)
+        if found_way is not None:
+            found_way["used"] = rel_id  # the way is represented by this feature now
+            props = get_element_props(found_way)
+        else:
+            # "out geom" data: the member way is not a separate element
+            props = {"type": "way", "id": outer_members[0]["ref"]}
+            member_tags = outer_members[0].get("tags")
+            if member_tags:
+                props["tags"] = member_tags
+        return {
+            "shape": multipolygon,
+            "properties": props,
+            # this feature carries the way's id on purpose - don't filter it out
+            "keep": True,
+        }
+
     return {"shape": multipolygon, "properties": get_element_props(rel)}
 
 
@@ -701,7 +830,7 @@ def to_multipolygon(obj, raise_on_failure=False):
         return obj
 
     if isinstance(obj, GeometryCollection):
-        p = [el for el in obj if isinstance(el, Polygon)]
+        p = [el for el in obj.geoms if isinstance(el, Polygon)]
         return MultiPolygon(p)
 
     if isinstance(obj, Polygon):

@@ -125,6 +125,21 @@ def parse_bounds(node: ElementTree.Element) -> dict:
     return copy_fields(node, ["minlat:float", "minlon:float", "maxlat:float", "maxlon:float"])
 
 
+def parse_center(node: ElementTree.Element) -> Optional[dict]:
+    """Parse the center child of an element ("out center" responses).
+
+    Args:
+        node: XML element whose children to search.
+
+    Returns:
+        Dictionary with lat/lon, or None if there is no center child.
+    """
+    center = node.find("center")
+    if center is None:
+        return None
+    return copy_fields(center, ["lat:float", "lon:float"])
+
+
 def parse_count(node: ElementTree.Element) -> dict:
     """Parse a count XML element.
 
@@ -194,7 +209,7 @@ def parse_way(node: ElementTree.Element) -> dict:
     Returns:
         Dictionary with way information.
     """
-    _bounds, tags, nds, _unhandled = parse_xml_node(node, ["nd"])
+    bounds, tags, nds, _unhandled = parse_xml_node(node, ["nd"])
     geometry = []
     nodes = []
     for nd in nds:
@@ -211,6 +226,11 @@ def parse_way(node: ElementTree.Element) -> dict:
         way["geometry"] = geometry
     if nodes:
         way["nodes"] = nodes
+    if bounds is not None:
+        way["bounds"] = bounds
+    center = parse_center(node)
+    if center is not None:
+        way["center"] = center
     return way
 
 
@@ -231,6 +251,9 @@ def parse_relation(node: ElementTree.Element) -> dict:
         relation["members"] = members
     if bounds is not None:
         relation["bounds"] = bounds
+    center = parse_center(node)
+    if center is not None:
+        relation["center"] = center
     if len(tags) > 0:
         relation["tags"] = tags_to_obj(tags)
     return relation

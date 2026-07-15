@@ -40,7 +40,9 @@ class TestOsm2GeoJsonMethods(unittest.TestCase):
         """
         xml = overpass_call("rel(448930); out geom;")
         data = xml2geojson(xml)
-        self.assertEqual(len(data["features"]), 1)
+        relations = [f for f in data["features"] if f["properties"]["type"] == "relation"]
+        self.assertEqual(len(relations), 1)
+        self.assertEqual(relations[0]["geometry"]["type"], "MultiPolygon")
 
     def test_issue_4(self):
         (data, saved_geojson) = get_osm_and_geojson_data("issue-4")

@@ -13386,6 +13386,20 @@
           ]
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "node",
+        "id": 3123035170
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.9317413,
+          51.4441976
+        ]
+      }
     }
   ]
 }

@@ -4,6 +4,33 @@
     {
       "type": "Feature",
       "properties": {
+        "type": "node",
+        "id": 3311728275,
+        "tags": {
+          "barrier": "block",
+          "bicycle": "yes",
+          "foot": "yes",
+          "horse": "yes",
+          "motor_vehicle": "no",
+          "note": "Low wall of bricks in the middle of the lane specifically for blocking passage",
+          "source": "survey 25 January 2015"
+        },
+        "timestamp": "2015-01-26T09:48:18Z",
+        "user": "TheSteelRat",
+        "uid": 614722,
+        "version": 1
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          26.2447415,
+          50.6138889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "type": "way",
         "id": 110768775,
         "tags": {

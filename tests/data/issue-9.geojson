@@ -4,13 +4,35 @@
     {
       "type": "Feature",
       "properties": {
+        "type": "node",
+        "id": 6038685227,
+        "tags": {
+          "barrier": "gate"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.1815196,
+          50.7425764
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "type": "way",
         "id": 361110018,
         "tags": {
           "source": "yahoo satellite"
         },
         "nodes": [
-          98939159, 603010137, 6038685227, 603010136, 603010135, 603010113
+          98939159,
+          603010137,
+          6038685227,
+          603010136,
+          603010135,
+          603010113
         ]
       },
       "geometry": {
