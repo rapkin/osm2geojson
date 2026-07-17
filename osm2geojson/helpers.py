@@ -11,6 +11,9 @@ import requests
 
 
 OVERPASS = "https://overpass-api.de/api/interpreter/"
+# overpass-api.de rejects generic client User-Agents (e.g. python-requests) with 406,
+# and the usage policy asks clients to identify themselves
+USER_AGENT = "osm2geojson (+https://github.com/rapkin/osm2geojson)"
 dirname = os.path.dirname(os.path.dirname(__file__))
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -61,23 +64,30 @@ def retry_request_multi(max_retries: int) -> Callable[[F], F]:
 
 
 @retry_request_multi(5)
-def overpass_call(query: str) -> str:
+def overpass_call(query: str, timeout: float = 180) -> str:
     """Call the Overpass API with the given query.
 
     Args:
         query: Overpass QL query string.
+        timeout: Timeout in seconds for the HTTP request (Overpass queries can
+            legitimately run long; raise this for heavy queries).
 
     Returns:
         Response text from the Overpass API.
 
     Raises:
         requests.exceptions.HTTPError: If the server returns a non-200 status.
+        requests.exceptions.Timeout: If the server does not respond in time.
     """
     encoded = urllib.parse.quote(query.encode("utf-8"), safe="~()*!.'")
     r = requests.post(
         OVERPASS,
         data=f"data={encoded}",
-        headers={"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            "User-Agent": USER_AGENT,
+        },
+        timeout=timeout,
     )
     if r.status_code != 200:
         raise requests.exceptions.HTTPError(f"Overpass server respond with status {r.status_code}")

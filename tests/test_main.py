@@ -1,7 +1,11 @@
 import json
+import os
 import unittest
 
 from osm2geojson import json2geojson, overpass_call, read_data_file, xml2geojson
+
+
+LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS")
 
 
 def get_osm_and_geojson_data(name):
@@ -29,7 +33,7 @@ class TestOsm2GeoJsonMethods(unittest.TestCase):
             (data, saved_geojson) = get_osm_and_geojson_data(name)
             self.assertDictEqual(saved_geojson, data)
 
-    @unittest.skip("Overpass API returns 504 error")
+    @unittest.skipUnless(LIVE_TESTS, "live Overpass API test; set OSM2GEOJSON_LIVE_TESTS=1 to run")
     def test_parsing_from_overpass(self):
         """
         Test city border convertation to MultiPolygon
@@ -103,6 +107,49 @@ class TestOsm2GeoJsonMethods(unittest.TestCase):
         # Verify it's a LineString, not a Polygon
         self.assertEqual(result["features"][0]["geometry"]["type"], "LineString")
         self.assertDictEqual(saved_geojson, result)
+
+    def test_relation_member_ways_filtered(self):
+        """
+        Queries like "rel(ID); way(r); out geom;" return the relation and its member
+        ways as separate elements, each with inline geometry. Member ways without
+        interesting tags of their own must not appear as extra features, while tagged
+        members (islands inside the river, nature reserves) are features in their own
+        right and must survive the filter — same behaviour as osmtogeojson.
+
+        Regression test for relation 1685222 (Rheinfall area of the Rhein river):
+        41 member ways, of which 11 carry their own tags.
+        """
+        (data, saved_geojson) = get_json_and_geojson_data("issue-relation-member-ways-filtered")
+        result = json2geojson(data)
+
+        self.assertEqual(len(result["features"]), 12)
+        relations = [f for f in result["features"] if f["properties"]["type"] == "relation"]
+        ways = [f for f in result["features"] if f["properties"]["type"] == "way"]
+        self.assertEqual(len(relations), 1)
+        self.assertEqual(len(ways), 11)
+        names = {f["properties"]["tags"]["name"] for f in ways if "name" in f["properties"]["tags"]}
+        self.assertIn("Insel Rheinau", names)
+        self.assertDictEqual(saved_geojson, result)
+
+    def test_filter_used_refs_id_spaces(self):
+        """
+        Node, way and relation ids live in separate id-spaces. A node consumed by a
+        way must not cause an unrelated way/relation with the same numeric id to be
+        filtered out.
+        """
+        data = {
+            "elements": [
+                {"type": "node", "id": 1, "lat": 1.0, "lon": 0.0},
+                {"type": "node", "id": 2, "lat": 2.0, "lon": 0.0},
+                {"type": "way", "id": 1, "tags": {"highway": "road"}, "nodes": [1, 2]},
+            ]
+        }
+        result = json2geojson(data)
+
+        self.assertEqual(len(result["features"]), 1)
+        props = result["features"][0]["properties"]
+        self.assertEqual(props["type"], "way")
+        self.assertEqual(props["id"], 1)
 
 
 if __name__ == "__main__":
