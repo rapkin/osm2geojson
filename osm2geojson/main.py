@@ -150,29 +150,7 @@ def _json2shapes(
 
     refs_index = build_refs_index(refs)
 
-    # Elements directly referenced by a relation are features in their own right
-    # (e.g. an admin_centre node) even when they also serve as way vertices.
-    # Node members that only exist inline ("out geom" responses) are synthesized
-    # into standalone elements so they show up as Point features.
-    synthesized = []
-    for el in refs:
-        if el["type"] == "relation":
-            for member in el.get("members", []):
-                found = get_ref(member, refs_index, silent=True)
-                if found is not None:
-                    found["_relation_member"] = True
-                elif member["type"] == "node" and "lat" in member and "lon" in member:
-                    node = {
-                        "type": "node",
-                        "id": member["ref"],
-                        "lat": member["lat"],
-                        "lon": member["lon"],
-                        "_relation_member": True,
-                    }
-                    if member.get("tags"):
-                        node["tags"] = member["tags"]
-                    synthesized.append(node)
-    for node in synthesized:
+    for node in mark_relation_members(refs, refs_index):
         elements.append(node)
         refs.append(node)
         refs_index[get_ref_name(node)] = node
@@ -203,10 +181,14 @@ def _json2shapes(
     for shape in shapes:
         if "properties" not in shape:
             warning("Shape without props", pformat(shape))
-        if not shape.get("keep") and (
-            shape["properties"].get("type"),
-            shape["properties"].get("id"),
-        ) in used:
+        if (
+            not shape.get("keep")
+            and (
+                shape["properties"].get("type"),
+                shape["properties"].get("id"),
+            )
+            in used
+        ):
             continue
         filtered_shapes.append(shape)
 
@@ -262,9 +244,49 @@ def build_refs_index(elements):
     return {get_ref_name(el): el for el in elements}
 
 
+def mark_relation_members(elements, refs_index):
+    """Flag elements that are direct members of a relation.
+
+    Such elements are features in their own right (e.g. an admin_centre node)
+    even when they also serve as way vertices. Node members that only exist
+    inline ("out geom" responses) are synthesized into standalone elements so
+    they show up as Point features: they are returned for the caller to add
+    to the element list and index.
+    """
+    synthesized = []
+    for el in elements:
+        if el["type"] != "relation":
+            continue
+        for member in el.get("members", []):
+            found = get_ref(member, refs_index, silent=True)
+            if found is not None:
+                found["_relation_member"] = True
+            elif member["type"] == "node" and "lat" in member and "lon" in member:
+                node = {
+                    "type": "node",
+                    "id": member["ref"],
+                    "lat": member["lat"],
+                    "lon": member["lon"],
+                    "_relation_member": True,
+                }
+                if member.get("tags"):
+                    node["tags"] = member["tags"]
+                synthesized.append(node)
+    return synthesized
+
+
+def _element_rank(el):
+    # newer version first, then completeness (a skeleton has fewer keys)
+    return (el.get("version", 0), len(el))
+
+
 def deduplicate_elements(elements):
-    # Overpass unions (e.g. "way(...); >;") can return the same element twice,
-    # sometimes as a skeleton. Keep the newest / most complete version.
+    """Drop repeated elements, keeping the newest / most complete version.
+
+    Overpass unions (e.g. "way(...); >;") can return the same element twice,
+    sometimes as a skeleton. Tags of same-version duplicates (overlapping
+    queries) are merged.
+    """
     best = {}
     order = []
     for el in elements:
@@ -272,19 +294,17 @@ def deduplicate_elements(elements):
             key = ("__no_id__", len(order))
         else:
             key = (el["type"], el["id"])
-        if key not in best:
+        seen = best.get(key)
+        if seen is None:
             order.append(key)
             best[key] = el
-        else:
-            winner, loser = el, best[key]
-            if (el.get("version", 0), len(el)) <= (best[key].get("version", 0), len(best[key])):
-                winner, loser = best[key], el
-            if winner.get("version") == loser.get("version"):
-                # same version seen twice (e.g. overlapping queries) - merge the tags
-                merged_tags = {**(loser.get("tags") or {}), **(winner.get("tags") or {})}
-                if merged_tags:
-                    winner = {**winner, "tags": merged_tags}
-            best[key] = winner
+            continue
+        winner, loser = (el, seen) if _element_rank(el) > _element_rank(seen) else (seen, el)
+        if winner.get("version") == loser.get("version"):
+            merged_tags = {**(loser.get("tags") or {}), **(winner.get("tags") or {})}
+            if merged_tags:
+                winner = {**winner, "tags": merged_tags}
+        best[key] = winner
     return [best[key] for key in order]
 
 
@@ -400,9 +420,7 @@ def way_to_shape(
             if node:
                 # nodes with own interesting tags (POIs) or referenced by relations
                 # stay separate features
-                if not has_interesting_tags(node.get("tags")) and not node.get(
-                    "_relation_member"
-                ):
+                if not (has_interesting_tags(node.get("tags")) or node.get("_relation_member")):
                     node["used"] = way["id"]
                 coords.append([node["lon"], node["lat"]])
             else:
@@ -739,24 +757,7 @@ def multipolygon_relation_to_shape(
             continue
 
         member["used"] = rel_id
-
-        # When member ways are also returned as separate elements (e.g. "rel(ID); way(r);
-        # out geom;"), members carry inline geometry and way_to_shape never touches the
-        # indexed element, so mark it as used here. Ways with their own interesting tags
-        # (islands inside a lake, nature reserves, ...) are features in their own right
-        # and stay in the output. For ref-resolved outer ways the relation's tags don't
-        # count as interesting (old-style multipolygon tagging); members with inline
-        # geometry keep their own tags meaningful.
-        found_way = get_ref(member, refs_index, silent=True)
-        if found_way is not None:
-            # For ref-resolved outer ways the relation's tags don't count as interesting
-            # (old-style multipolygon tagging) - same rule as osmtogeojson. Members with
-            # inline geometry keep their own tags meaningful.
-            ignore_tags = None
-            if member.get("role") == "outer" and "geometry" not in member:
-                ignore_tags = rel.get("tags")
-            if not has_interesting_tags(found_way.get("tags"), ignore_tags):
-                found_way["used"] = rel_id
+        mark_member_way_used(member, rel, refs_index, rel_id)
 
         way_shape = way_to_shape(
             member, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
@@ -801,28 +802,56 @@ def multipolygon_relation_to_shape(
             raise Exception(message)
         return None
 
-    # Old-style multipolygon (tags on the outer way, relation carries only type=...):
-    # attribute the feature to the outer way, like osmtogeojson does
-    outer_members = [m for m in members if m.get("role", "outer") in ("outer", "")]
-    if len(outer_members) == 1 and not has_interesting_tags(rel.get("tags"), {"type": True}):
-        found_way = get_ref(outer_members[0], refs_index, silent=True)
-        if found_way is not None:
-            found_way["used"] = rel_id  # the way is represented by this feature now
-            props = get_element_props(found_way)
-        else:
-            # "out geom" data: the member way is not a separate element
-            props = {"type": "way", "id": outer_members[0]["ref"]}
-            member_tags = outer_members[0].get("tags")
-            if member_tags:
-                props["tags"] = member_tags
-        return {
-            "shape": multipolygon,
-            "properties": props,
-            # this feature carries the way's id on purpose - don't filter it out
-            "keep": True,
-        }
-
+    old_style = old_style_multipolygon_shape(rel, members, refs_index, rel_id, multipolygon)
+    if old_style is not None:
+        return old_style
     return {"shape": multipolygon, "properties": get_element_props(rel)}
+
+
+def mark_member_way_used(member, rel, refs_index, rel_id):
+    """Mark the indexed element behind a relation-member way as used.
+
+    When member ways are also returned as separate elements (e.g. "rel(ID);
+    way(r); out geom;"), members carry inline geometry and way_to_shape never
+    touches the indexed element, so it must be marked here. Ways with their
+    own interesting tags (islands inside a lake, nature reserves, ...) are
+    features in their own right and stay in the output. For ref-resolved
+    outer ways the relation's tags don't count as interesting (old-style
+    multipolygon tagging, same rule as osmtogeojson); members with inline
+    geometry keep their own tags meaningful.
+    """
+    found_way = get_ref(member, refs_index, silent=True)
+    if found_way is None:
+        return
+    ignore_tags = None
+    if member.get("role") == "outer" and "geometry" not in member:
+        ignore_tags = rel.get("tags")
+    if not has_interesting_tags(found_way.get("tags"), ignore_tags):
+        found_way["used"] = rel_id
+
+
+def old_style_multipolygon_shape(rel, members, refs_index, rel_id, multipolygon):
+    """Attribute an old-style multipolygon to its outer way, like osmtogeojson.
+
+    Old-style tagging puts the tags on the single outer way while the relation
+    carries only type=multipolygon. Returns the shape dict for such relations,
+    or None for modern multipolygons (tags on the relation).
+    """
+    outer_members = [m for m in members if m.get("role", "outer") in ("outer", "")]
+    if len(outer_members) != 1 or has_interesting_tags(rel.get("tags"), {"type": True}):
+        return None
+    outer = outer_members[0]
+    found_way = get_ref(outer, refs_index, silent=True)
+    if found_way is not None:
+        found_way["used"] = rel_id  # the way is represented by this feature now
+        props = get_element_props(found_way)
+    else:
+        # "out geom" data: the member way is not a separate element
+        props = {"type": "way", "id": outer["ref"]}
+        if outer.get("tags"):
+            props["tags"] = outer["tags"]
+    # this feature carries the way's id on purpose - "keep" shields it from filter_used_refs
+    return {"shape": multipolygon, "properties": props, "keep": True}
 
 
 def to_multipolygon(obj, raise_on_failure=False):
