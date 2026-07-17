@@ -51,7 +51,14 @@ produced for the same input is not:
   rejects generic clients with 406) and use a request timeout.
 - CLI output keeps non-ASCII text (names, addresses) as readable UTF-8
   instead of \\uXXXX escapes, and file I/O uses UTF-8 explicitly regardless
-  of the platform locale.
+  of the platform locale (stdout included - Windows consoles default to a
+  legacy code page).
+- The CLI module ran at import time (no `if __name__ == "__main__"` guard),
+  so importing `osm2geojson.__main__` executed the converter and exited the
+  interpreter; the `osm2geojson` console script only worked by accident.
+- `--reader auto` now also sniffs the file content (`<` vs `{`) when the
+  extension is not recognized, and a missing input file gets a proper error
+  message instead of an argparse traceback.
 
 ### Added
 

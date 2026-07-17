@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import sys
+from contextlib import nullcontext
 
 from .main import json2geojson, xml2geojson
 
@@ -11,7 +12,7 @@ from .main import json2geojson, xml2geojson
 def setup_parser() -> argparse.ArgumentParser:
     def file(v: str) -> str:
         if not os.path.exists(v):
-            raise ValueError(v)
+            raise argparse.ArgumentTypeError(f"file not found: {v}")
         return v
 
     parser = argparse.ArgumentParser(prog=__package__)
@@ -45,7 +46,8 @@ def setup_parser() -> argparse.ArgumentParser:
         "--no-unused-filter",
         action="store_false",
         dest="filter_used_refs",
-        help="don't filter unused references (only in shape JSON)",
+        help="keep elements that are only used as parts of other features "
+        "(by default they are filtered out)",
     )
     parser.add_argument(
         "--areas",
@@ -64,18 +66,25 @@ def setup_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def detect_reader(infile: str, data: str) -> str:
+    """Pick 'xml' or 'json' from the file extension, else sniff the content."""
+    if infile.endswith((".osm", ".xml")):
+        return "xml"
+    if infile.endswith(".json"):
+        return "json"
+    head = data.lstrip()[:1]
+    if head == "<":
+        return "xml"
+    if head in ("{", "["):
+        return "json"
+    return ""
+
+
 def main(args=None) -> int:
-    args = args or sys.argv[1:]
+    if args is None:
+        args = sys.argv[1:]
     parser = setup_parser()
     args = parser.parse_args(args)
-
-    if args.reader == "xml" or (args.reader == "auto" and args.infile.endswith((".osm", ".xml"))):
-        parser_function = xml2geojson
-    elif args.reader == "json" or (args.reader == "auto" and args.infile.endswith(".json")):
-        parser_function = json2geojson
-    else:
-        print("Auto-detecting input file format failed. Consider using --reader.", file=sys.stderr)
-        return 1
 
     if args.outfile != "-" and os.path.exists(args.outfile) and not args.force:
         print(
@@ -86,6 +95,15 @@ def main(args=None) -> int:
 
     with open(args.infile, encoding="utf-8") as f:
         data = f.read()
+
+    reader = args.reader if args.reader != "auto" else detect_reader(args.infile, data)
+    if reader == "xml":
+        parser_function = xml2geojson
+    elif reader == "json":
+        parser_function = json2geojson
+    else:
+        print("Auto-detecting input file format failed. Consider using --reader.", file=sys.stderr)
+        return 1
 
     log_level = "WARNING"
     if args.quiet:
@@ -116,25 +134,20 @@ def main(args=None) -> int:
     if indent and indent < 0:
         indent = None
     if args.outfile == "-":
-        target = sys.stdout
+        # Windows consoles often default to a legacy code page (e.g. cp1252)
+        # that cannot encode the UTF-8 text we emit
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+        target = nullcontext(sys.stdout)
     else:
         target = open(args.outfile, "w", encoding="utf-8")
 
-    code = 0
-    try:
+    with target as f:
         # ensure_ascii=False: keep non-ASCII text (names, descriptions) readable
         # instead of \uXXXX escapes
-        print(json.dumps(result, indent=indent, ensure_ascii=False), file=target)
-    except (TypeError, ValueError) as exc:
-        print(exc, file=sys.stderr)
-        print("Falling back to raw dumping the object...", file=sys.stderr)
-        print(result, file=target)
-        code = 1
-
-    if args.outfile != "-":
-        target.flush()
-        target.close()
-    return code
+        print(json.dumps(result, indent=indent, ensure_ascii=False), file=f)
+    return 0
 
 
-exit(main(sys.argv[1:]))
+if __name__ == "__main__":
+    sys.exit(main())
