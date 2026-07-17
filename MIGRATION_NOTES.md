@@ -16,7 +16,9 @@ This document tracks changes from the old workflow to the new modernized workflo
   (previously a bare `Exception`). It subclasses `Exception`, so existing
   handlers keep working.
 - **`overpass_call`** gained keyword-only `endpoint`, `retries` and
-  `retry_delay` parameters; `timeout` is keyword-only now.
+  `retry_delay` parameters; `timeout` is keyword-only now. Retries apply to
+  429/5xx statuses, timeouts and connection errors only - client errors
+  (e.g. 400 for a malformed query) fail immediately.
 - **Removed from the public API**: `read_data_file` (a test helper that never
   worked in installed packages) and the `retry_request_multi` decorator.
 - **Converted output**: see the 1.0.0 release notes - the same input can yield

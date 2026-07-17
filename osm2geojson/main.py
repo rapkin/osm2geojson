@@ -9,7 +9,7 @@ import json
 import logging
 import os
 from pprint import pformat
-from typing import Optional
+from typing import Optional, Union
 
 from shapely.geometry import (
     GeometryCollection,
@@ -76,14 +76,14 @@ def _copy_elements(elements):
 
 
 def json2geojson(
-    data,
+    data: Union[str, dict],
     *,
-    filter_used_refs=True,
-    log_level=None,
+    filter_used_refs: bool = True,
+    log_level: Optional[str] = None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
-    raise_on_failure=False,
-):
+    raise_on_failure: bool = False,
+) -> dict:
     if isinstance(data, str):
         data = json.loads(data)
     else:
@@ -94,14 +94,14 @@ def json2geojson(
 
 
 def xml2geojson(
-    xml_str,
+    xml_str: str,
     *,
-    filter_used_refs=True,
-    log_level=None,
+    filter_used_refs: bool = True,
+    log_level: Optional[str] = None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
-    raise_on_failure=False,
-):
+    raise_on_failure: bool = False,
+) -> dict:
     data = parse_xml(xml_str)
     return _json2geojson(
         data, filter_used_refs, log_level, area_keys, polygon_features, raise_on_failure
@@ -109,14 +109,14 @@ def xml2geojson(
 
 
 def json2shapes(
-    data,
+    data: Union[str, dict],
     *,
-    filter_used_refs=True,
-    log_level=None,
+    filter_used_refs: bool = True,
+    log_level: Optional[str] = None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
-    raise_on_failure=False,
-):
+    raise_on_failure: bool = False,
+) -> list:
     if isinstance(data, str):
         data = json.loads(data)
     else:
@@ -127,14 +127,14 @@ def json2shapes(
 
 
 def xml2shapes(
-    xml_str,
+    xml_str: str,
     *,
-    filter_used_refs=True,
-    log_level=None,
+    filter_used_refs: bool = True,
+    log_level: Optional[str] = None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
-    raise_on_failure=False,
-):
+    raise_on_failure: bool = False,
+) -> list:
     data = parse_xml(xml_str)
     return _json2shapes(
         data, filter_used_refs, log_level, area_keys, polygon_features, raise_on_failure

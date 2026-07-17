@@ -3,11 +3,9 @@
 ![Test package](https://github.com/rapkin/osm2geojson/workflows/Test%20package/badge.svg)
 [![PyPI version](https://img.shields.io/pypi/v/osm2geojson.svg)](https://pypi.org/project/osm2geojson/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-<!-- [![Python versions](https://img.shields.io/pypi/pyversions/osm2geojson.svg)](https://pypi.org/project/osm2geojson/) -->
+[![Python versions](https://img.shields.io/pypi/pyversions/osm2geojson.svg)](https://pypi.org/project/osm2geojson/)
 
 Parse OSM and Overpass JSON/XML to GeoJSON with Python.
-
-**This library is under development!**
 
 ---
 
@@ -186,13 +184,16 @@ geojson = osm2geojson.json2geojson(result)
 ### Quick Start
 
 ```bash
-# Clone with submodules
-git clone --recurse-submodules https://github.com/rapkin/osm2geojson.git
+git clone https://github.com/rapkin/osm2geojson.git
 cd osm2geojson
 
 # One-command setup (installs deps + pre-commit hooks)
 make setup
 ```
+
+Submodules (`osm-polygon-features`, `id-area-keys`) are optional - they are
+only needed to regenerate the bundled JSON data (`update-osm-polygon-features.sh`).
+Fetch them with `git submodule update --init` when needed.
 
 ### Development Workflow
 
@@ -293,10 +294,3 @@ Uses data from:
 - [osm-polygon-features](https://github.com/tyrasd/osm-polygon-features) - Polygon feature definitions
 - [id-area-keys](https://github.com/openstreetmap/id-tagging-schema) - Area key definitions
 
----
-
-### ToDo
-
- * Rewrite _convert_shapes_to_multipolygon (and other multipolygon methods) to support complex situations with enclaves
- * Add tests and examples for cli tool
- * Add actions related to cli tool (more info https://github.com/rapkin/osm2geojson/pull/32#issuecomment-1073386381)

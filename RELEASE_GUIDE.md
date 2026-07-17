@@ -16,11 +16,28 @@ Before you can publish, configure Trusted Publishers on PyPI (most secure method
    Owner: rapkin
    Repository: osm2geojson
    Workflow name: pythonpublish.yml
-   Environment name: (leave blank)
+   Environment name: pypi
    ```
+   (The publish workflow runs in the `pypi` environment; you can add required
+   reviewers or other protection rules for it under repo Settings →
+   Environments.)
 4. **Save** - That's it! No passwords or tokens needed.
 
 ## Release Process
+
+### Release candidates for risky releases
+
+For releases that change converter output or the API, publish a release
+candidate first (e.g. `./bump_version.sh 1.0.0rc1`, then the normal flow).
+pip does not install pre-releases by default, so unpinned users are
+unaffected; heavy downstream users can test with:
+
+```bash
+pip install --pre --upgrade osm2geojson
+```
+
+Mention the RC in the repo / relevant issues, wait a week or two, then
+release the final version.
 
 ### 1. Prepare the Release
 

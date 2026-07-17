@@ -32,7 +32,10 @@ produced for the same input is not:
   logger on every call; use `logging.getLogger("osm2geojson")`.
 - `ConversionError` replaces bare `Exception` for `raise_on_failure=True`.
 - `overpass_call` accepts keyword-only `endpoint`, `timeout`, `retries`,
-  `retry_delay`.
+  `retry_delay`, and retries only what can succeed: rate limiting (429),
+  transient server errors (5xx), timeouts and connection errors are retried;
+  client errors like 400 fail immediately (previously every non-200 was
+  retried and network errors were not).
 - Removed `read_data_file` and `retry_request_multi` from the public API.
 
 ### Fixed
@@ -58,6 +61,7 @@ produced for the same input is not:
 - Comparison/benchmark tool (`tests/tools/compare_osmtogeojson.py`): runs
   any OSM file through both converters, classifies every geometry difference
   as expected (with reason) or unexpected, and writes an HTML report.
+- `py.typed` marker: type checkers now use the package's annotations.
 
 ## 0.3.2 and earlier
 
