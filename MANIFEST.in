@@ -1,0 +1,4 @@
+
+# The sdist should carry only the package itself; tests need tests/data,
+# which is deliberately not shipped (multi-MB fixtures).
+prune tests
