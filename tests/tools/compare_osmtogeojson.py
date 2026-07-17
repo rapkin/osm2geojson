@@ -131,6 +131,10 @@ def unwrap(geom):
 
 def compare_geometries(py_geom, js_geom, tolerance):
     """Return (verdict, detail) where verdict is identical/close/different."""
+    if py_geom is not None and py_geom == js_geom:
+        # structurally identical GeoJSON; also dodges GEOS-version-dependent
+        # .equals() results on degenerate geometry (e.g. zero-length lines)
+        return "identical", ""
     s_py, s_js = to_shape(py_geom), to_shape(js_geom)
     if s_py is None or s_js is None:
         if s_py is s_js:

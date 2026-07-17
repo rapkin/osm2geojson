@@ -88,6 +88,10 @@ def _unwrap(geom):
 def _geom_equal(g1, g2):
     if g1 is None or g2 is None:
         return g1 is g2
+    if g1 == g2:
+        # structurally identical GeoJSON; also dodges GEOS-version-dependent
+        # .equals() results on degenerate geometry (e.g. zero-length lines)
+        return True
     s1, s2 = shape(g1), shape(g2)
     if s1.geom_type != s2.geom_type:
         s1, s2 = _unwrap(s1), _unwrap(s2)
