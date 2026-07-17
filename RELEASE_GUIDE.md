@@ -76,7 +76,8 @@ pip install dist/osm2geojson-*.whl  # Test installation
 ### 4. Update Documentation (Optional)
 
 - Update `README.md` if there are notable changes
-- Update `CHANGELOG.md` (if exists) with release notes
+- Update `CHANGELOG.md` with release notes (its latest section doubles as the
+  GitHub Release description in step 6)
 - Document any breaking changes
 
 ### 5. Push to GitHub
