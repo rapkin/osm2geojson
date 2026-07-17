@@ -25,6 +25,11 @@ This document tracks changes from the old workflow to the new modernized workflo
   more features (POI nodes, relation members) and different geometry types
   (boundary relations as MultiPolygon, unclosed `area=yes` ways as LineString),
   matching osmtogeojson's behavior.
+- **Route/waterway members are absorbed**: member ways of `route`/`waterway`
+  relations without their own interesting tags are no longer emitted as
+  separate LineString features - the relation's geometry represents them. If
+  you iterated per-way features of such relations, read the relation's
+  MultiLineString instead (or query the ways with tags of their own).
 
 ## Removed Files
 
@@ -106,9 +111,9 @@ python -m unittest  # Run tests
 
 ### New Setup
 ```bash
-git clone --recurse-submodules https://github.com/rapkin/osm2geojson.git
+git clone https://github.com/rapkin/osm2geojson.git
 cd osm2geojson
-make setup         # One command!
+make setup         # One command! (submodules are optional, only for data regen)
 make all           # Check everything
 # Release via GitHub Release (automatic)
 ```
@@ -122,12 +127,12 @@ make all           # Check everything
 - ❌ `setup.cfg` - Additional config
 - ❌ `requirements.txt` - Dependencies
 - ❌ `requirements-dev.txt` - Dev dependencies
-- ❌ `MANIFEST.in` - Package data
 - ❌ `lint.sh` - Linting script
 - ❌ `release.sh` - Manual release script
 
 ### New
 - ✅ `pyproject.toml` - **Everything in one file!**
+- ✅ `MANIFEST.in` - back for one job: keep multi-MB test fixtures out of the sdist
 - ✅ `Makefile` - Common tasks
 - ✅ `.pre-commit-config.yaml` - Automated checks
 

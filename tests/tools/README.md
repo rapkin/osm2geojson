@@ -81,9 +81,10 @@ to be run by hand.
 
 ## extract_osmtogeojson_fixtures.js
 
-One-off extractor that produced `tests/data/osmtogeojson-fixtures.json` from
-osmtogeojson's own test suite; see the header comment in the file and the
-docstring of `tests/test_osmtogeojson_compat.py`. It resolves the library and
+Extractor that produces `tests/data/osmtogeojson-fixtures.json` from
+osmtogeojson's own test suite (running it against the same osmtogeojson
+version regenerates the checked-in file byte-identically); see the header
+comment in the file and the docstring of `tests/test_osmtogeojson_compat.py`. It resolves the library and
 its test suite relative to its own location, so copy it into an osmtogeojson
 checkout and run it there:
 

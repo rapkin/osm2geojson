@@ -331,11 +331,15 @@ def deduplicate_elements(elements):
             best[key] = el
             continue
         winner, loser = (el, seen) if _element_rank(el) > _element_rank(seen) else (seen, el)
+        # the loser fills in fields the winner lacks: Overpass unions can split
+        # one element over several copies (e.g. "out tags;" + "out skel geom;"),
+        # and dropping the geometry-bearing copy would lose the element entirely
+        merged = {**loser, **winner}
         if winner.get("version") == loser.get("version"):
             merged_tags = {**(loser.get("tags") or {}), **(winner.get("tags") or {})}
             if merged_tags:
-                winner = {**winner, "tags": merged_tags}
-        best[key] = winner
+                merged["tags"] = merged_tags
+        best[key] = merged
     return [best[key] for key in order]
 
 

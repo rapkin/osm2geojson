@@ -6,7 +6,7 @@ from osm2geojson import overpass_call, parse_xml
 from tests.utils import read_data_file
 
 
-LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS")
+LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS", "").lower() not in ("", "0", "false")
 
 
 class TestParseXmlMethods(unittest.TestCase):

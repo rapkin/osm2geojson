@@ -95,4 +95,38 @@ const failed = cases.filter((c) => c.status !== "pass");
 console.log("cases:", cases.length, "| js-assertion failures:", failed.length);
 failed.forEach((c) => console.log("  FAIL:", c.describe, "/", c.it, "->", c.error));
 console.log("total recorded calls:", cases.reduce((n, c) => n + c.calls.length, 0));
-fs.writeFileSync(process.argv[2] || "fixtures.json", JSON.stringify(cases, null, 1));
+
+// Reduce to the format checked in as tests/data/osmtogeojson-fixtures.json:
+// cases exercising osmtogeojson-specific API options (featureCallback,
+// flatProperties: true, custom uninterestingTags/deduplicators/polygon
+// detection) are excluded - osmtogeojson's suite passes
+// {flatProperties: false} (its default) everywhere else - and each remaining
+// call keeps only (input_type, input, output).
+function isDefaultOpts(o) {
+  return (
+    o.present &&
+    !o.hasFunctions &&
+    o.serializable !== null &&
+    Object.keys(o.serializable).length === 1 &&
+    o.serializable.flatProperties === false
+  );
+}
+const fixtures = cases
+  .filter(
+    (c) =>
+      c.status === "pass" &&
+      c.calls.length > 0 &&
+      c.calls.every(
+        (call) => isDefaultOpts(call.opts) && call.input !== null && call.output !== null
+      )
+  )
+  .map((c) => ({
+    name: c.describe + " / " + c.it,
+    calls: c.calls.map((call) => ({
+      input_type: call.input_type,
+      input: call.input,
+      output: call.output,
+    })),
+  }));
+console.log("fixture cases kept:", fixtures.length);
+fs.writeFileSync(process.argv[2] || "fixtures.json", JSON.stringify(fixtures, null, 1));

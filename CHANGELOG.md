@@ -21,8 +21,14 @@ produced for the same input is not:
   a LineString (was self-closed into a Polygon).
 - **Different attribution**: old-style multipolygons (tags on the single
   outer way) are attributed to the outer way, like osmtogeojson.
+- **Fewer features**: member ways of `route`/`waterway` relations without
+  their own interesting tags are absorbed into the relation's geometry and
+  no longer emitted as separate LineString features (same rule as
+  osmtogeojson).
 - **Fewer duplicates**: elements returned twice by overlapping Overpass
-  queries collapse into one feature.
+  queries collapse into one feature (the newest version wins; tags and
+  fields missing from one copy - e.g. geometry - are filled in from the
+  other).
 
 ### ⚠️ Breaking: API changes
 
@@ -47,6 +53,9 @@ produced for the same input is not:
 - Nodes without coordinates and member geometry containing null no longer
   crash the conversion; tainted ways degrade to partial geometry instead of
   being dropped.
+- Relations whose merged geometry produced a GeometryCollection raised
+  TypeError on Shapely 2.x and were dropped; they convert now (previously
+  missing features will appear).
 - Overpass API requests send an identifying User-Agent (overpass-api.de
   rejects generic clients with 406) and use a request timeout.
 - CLI output keeps non-ASCII text (names, addresses) as readable UTF-8
