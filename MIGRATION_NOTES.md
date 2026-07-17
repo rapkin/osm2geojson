@@ -2,6 +2,35 @@
 
 This document tracks changes from the old workflow to the new modernized workflow.
 
+## API changes in 1.0.0
+
+- **Converter options are keyword-only**: call
+  `json2geojson(data, filter_used_refs=False)`, not `json2geojson(data, False)`.
+- **Input data is no longer mutated**: converters used to annotate the passed
+  Overpass dict with internal keys (`used`); they now work on a copy.
+- **Logging is left alone by default**: `log_level` defaults to `None` (the old
+  default forced the library logger to `ERROR` on every call). Configure
+  diagnostics with `logging.getLogger("osm2geojson").setLevel(...)` or pass
+  `log_level=` explicitly.
+- **`ConversionError`** is raised on failures with `raise_on_failure=True`
+  (previously a bare `Exception`). It subclasses `Exception`, so existing
+  handlers keep working.
+- **`overpass_call`** gained keyword-only `endpoint`, `retries` and
+  `retry_delay` parameters; `timeout` is keyword-only now. Retries apply to
+  429/5xx statuses, timeouts and connection errors only - client errors
+  (e.g. 400 for a malformed query) fail immediately.
+- **Removed from the public API**: `read_data_file` (a test helper that never
+  worked in installed packages) and the `retry_request_multi` decorator.
+- **Converted output**: see the 1.0.0 release notes - the same input can yield
+  more features (POI nodes, relation members) and different geometry types
+  (boundary relations as MultiPolygon, unclosed `area=yes` ways as LineString),
+  matching osmtogeojson's behavior.
+- **Route/waterway members are absorbed**: member ways of `route`/`waterway`
+  relations without their own interesting tags are no longer emitted as
+  separate LineString features - the relation's geometry represents them. If
+  you iterated per-way features of such relations, read the relation's
+  MultiLineString instead (or query the ways with tags of their own).
+
 ## Removed Files
 
 ### `lint.sh` (Removed)
@@ -82,9 +111,9 @@ python -m unittest  # Run tests
 
 ### New Setup
 ```bash
-git clone --recurse-submodules https://github.com/rapkin/osm2geojson.git
+git clone https://github.com/rapkin/osm2geojson.git
 cd osm2geojson
-make setup         # One command!
+make setup         # One command! (submodules are optional, only for data regen)
 make all           # Check everything
 # Release via GitHub Release (automatic)
 ```
@@ -98,12 +127,12 @@ make all           # Check everything
 - ❌ `setup.cfg` - Additional config
 - ❌ `requirements.txt` - Dependencies
 - ❌ `requirements-dev.txt` - Dev dependencies
-- ❌ `MANIFEST.in` - Package data
 - ❌ `lint.sh` - Linting script
 - ❌ `release.sh` - Manual release script
 
 ### New
 - ✅ `pyproject.toml` - **Everything in one file!**
+- ✅ `MANIFEST.in` - back for one job: keep multi-MB test fixtures out of the sdist
 - ✅ `Makefile` - Common tasks
 - ✅ `.pre-commit-config.yaml` - Automated checks
 

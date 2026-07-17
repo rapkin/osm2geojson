@@ -9,7 +9,7 @@ import json
 import logging
 import os
 from pprint import pformat
-from typing import Optional
+from typing import Optional, Union
 
 from shapely.geometry import (
     GeometryCollection,
@@ -45,6 +45,10 @@ else:
     _default_area_keys = {}
 
 
+class ConversionError(Exception):
+    """Raised when OSM data cannot be converted (with raise_on_failure=True)."""
+
+
 def get_message(*args):
     return " ".join(args)
 
@@ -57,29 +61,47 @@ def error(*args):
     logger.error(" ".join(args))
 
 
+def _copy_elements(elements):
+    # The conversion annotates elements (and relation members) with bookkeeping
+    # keys ("used", "_relation_member"); copy enough structure that the caller's
+    # data stays untouched. Only these dicts gain keys - nested values (tags,
+    # geometry) are never mutated, so a shallow copy per dict is sufficient.
+    copied = []
+    for el in elements:
+        el = dict(el)
+        if "members" in el:
+            el["members"] = [dict(member) for member in el["members"]]
+        copied.append(el)
+    return copied
+
+
 def json2geojson(
-    data,
-    filter_used_refs=True,
-    log_level="ERROR",
+    data: Union[str, dict],
+    *,
+    filter_used_refs: bool = True,
+    log_level: Optional[str] = None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
-    raise_on_failure=False,
-):
+    raise_on_failure: bool = False,
+) -> dict:
     if isinstance(data, str):
         data = json.loads(data)
+    else:
+        data = {**data, "elements": _copy_elements(data["elements"])}
     return _json2geojson(
         data, filter_used_refs, log_level, area_keys, polygon_features, raise_on_failure
     )
 
 
 def xml2geojson(
-    xml_str,
-    filter_used_refs=True,
-    log_level="ERROR",
+    xml_str: str,
+    *,
+    filter_used_refs: bool = True,
+    log_level: Optional[str] = None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
-    raise_on_failure=False,
-):
+    raise_on_failure: bool = False,
+) -> dict:
     data = parse_xml(xml_str)
     return _json2geojson(
         data, filter_used_refs, log_level, area_keys, polygon_features, raise_on_failure
@@ -87,28 +109,32 @@ def xml2geojson(
 
 
 def json2shapes(
-    data,
-    filter_used_refs=True,
-    log_level="ERROR",
+    data: Union[str, dict],
+    *,
+    filter_used_refs: bool = True,
+    log_level: Optional[str] = None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
-    raise_on_failure=False,
-):
+    raise_on_failure: bool = False,
+) -> list:
     if isinstance(data, str):
         data = json.loads(data)
+    else:
+        data = {**data, "elements": _copy_elements(data["elements"])}
     return _json2shapes(
         data, filter_used_refs, log_level, area_keys, polygon_features, raise_on_failure
     )
 
 
 def xml2shapes(
-    xml_str,
-    filter_used_refs=True,
-    log_level="ERROR",
+    xml_str: str,
+    *,
+    filter_used_refs: bool = True,
+    log_level: Optional[str] = None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
-    raise_on_failure=False,
-):
+    raise_on_failure: bool = False,
+) -> list:
     data = parse_xml(xml_str)
     return _json2shapes(
         data, filter_used_refs, log_level, area_keys, polygon_features, raise_on_failure
@@ -118,7 +144,7 @@ def xml2shapes(
 def _json2geojson(
     data,
     filter_used_refs=True,
-    log_level="ERROR",
+    log_level=None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
     raise_on_failure=False,
@@ -136,19 +162,27 @@ def _json2geojson(
 def _json2shapes(
     data,
     filter_used_refs=True,
-    log_level="ERROR",
+    log_level=None,
     area_keys: Optional[dict] = None,
     polygon_features: Optional[list] = None,
     raise_on_failure=False,
 ):
-    logger.setLevel(log_level)
+    if log_level is not None:
+        logger.setLevel(log_level)
     shapes = []
 
-    refs = [el for el in data["elements"] if el["type"] in ["node", "way", "relation"]]
+    elements = deduplicate_elements(data["elements"])
+
+    refs = [el for el in elements if el["type"] in ["node", "way", "relation"]]
 
     refs_index = build_refs_index(refs)
 
-    for el in data["elements"]:
+    for node in mark_relation_members(refs, refs_index):
+        elements.append(node)
+        refs.append(node)
+        refs_index[get_ref_name(node)] = node
+
+    for el in elements:
         shape = element_to_shape(
             el, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
         )
@@ -165,20 +199,28 @@ def _json2shapes(
             else:
                 warning("Element not converted", pformat(el_id))
 
-    if not filter_used_refs:
-        return shapes
+    if filter_used_refs:
+        # key by (type, id): node, way and relation ids live in separate id-spaces
+        used = {(ref["type"], ref["id"]): ref["used"] for ref in refs if "used" in ref}
+        filtered_shapes = []
+        for shape in shapes:
+            if "properties" not in shape:
+                warning("Shape without props", pformat(shape))
+            if (
+                not shape.get("keep")
+                and (
+                    shape["properties"].get("type"),
+                    shape["properties"].get("id"),
+                )
+                in used
+            ):
+                continue
+            filtered_shapes.append(shape)
+        shapes = filtered_shapes
 
-    # key by (type, id): node, way and relation ids live in separate id-spaces
-    used = {(ref["type"], ref["id"]): ref["used"] for ref in refs if "used" in ref}
-    filtered_shapes = []
     for shape in shapes:
-        if "properties" not in shape:
-            warning("Shape without props", pformat(shape))
-        if (shape["properties"].get("type"), shape["properties"].get("id")) in used:
-            continue
-        filtered_shapes.append(shape)
-
-    return filtered_shapes
+        shape.pop("keep", None)  # internal filtering flag, not part of the result
+    return shapes
 
 
 def element_to_shape(
@@ -230,6 +272,77 @@ def build_refs_index(elements):
     return {get_ref_name(el): el for el in elements}
 
 
+def mark_relation_members(elements, refs_index):
+    """Flag elements that are direct members of a relation.
+
+    Such elements are features in their own right (e.g. an admin_centre node)
+    even when they also serve as way vertices. Node members that only exist
+    inline ("out geom" responses) are synthesized into standalone elements so
+    they show up as Point features: they are returned for the caller to add
+    to the element list and index.
+    """
+    synthesized = {}
+    for el in elements:
+        if el["type"] != "relation":
+            continue
+        for member in el.get("members", []):
+            found = get_ref(member, refs_index, silent=True)
+            if found is None:
+                # a node already synthesized for another relation's member
+                found = synthesized.get(_get_ref_name(member["type"], member["ref"]))
+            if found is not None:
+                found["_relation_member"] = True
+            elif member["type"] == "node" and "lat" in member and "lon" in member:
+                node = {
+                    "type": "node",
+                    "id": member["ref"],
+                    "lat": member["lat"],
+                    "lon": member["lon"],
+                    "_relation_member": True,
+                }
+                if member.get("tags"):
+                    node["tags"] = member["tags"]
+                synthesized[get_ref_name(node)] = node
+    return list(synthesized.values())
+
+
+def _element_rank(el):
+    # newer version first, then completeness (a skeleton has fewer keys)
+    return (el.get("version", 0), len(el))
+
+
+def deduplicate_elements(elements):
+    """Drop repeated elements, keeping the newest / most complete version.
+
+    Overpass unions (e.g. "way(...); >;") can return the same element twice,
+    sometimes as a skeleton. Tags of same-version duplicates (overlapping
+    queries) are merged.
+    """
+    best = {}
+    order = []
+    for el in elements:
+        if "type" not in el or "id" not in el:
+            key = ("__no_id__", len(order))
+        else:
+            key = (el["type"], el["id"])
+        seen = best.get(key)
+        if seen is None:
+            order.append(key)
+            best[key] = el
+            continue
+        winner, loser = (el, seen) if _element_rank(el) > _element_rank(seen) else (seen, el)
+        # the loser fills in fields the winner lacks: Overpass unions can split
+        # one element over several copies (e.g. "out tags;" + "out skel geom;"),
+        # and dropping the geometry-bearing copy would lose the element entirely
+        merged = {**loser, **winner}
+        if winner.get("version") == loser.get("version"):
+            merged_tags = {**(loser.get("tags") or {}), **(winner.get("tags") or {})}
+            if merged_tags:
+                merged["tags"] = merged_tags
+        best[key] = merged
+    return [best[key] for key in order]
+
+
 # Tag keys that don't make an element a feature in its own right
 # (same blacklist as osmtogeojson)
 UNINTERESTING_TAGS = {
@@ -250,14 +363,29 @@ def has_interesting_tags(tags, ignore_tags=None):
     for key, value in (tags or {}).items():
         if key in UNINTERESTING_TAGS:
             continue
-        if key in ignore_tags and ignore_tags[key] == value:
+        if key in ignore_tags and (ignore_tags[key] is True or ignore_tags[key] == value):
             continue
         return True
     return False
 
 
 def node_to_shape(node):
+    if "lon" not in node or "lat" not in node:
+        logger.debug("Node without coordinates: %s", node.get("id"))
+        return None
     return {"shape": Point(node["lon"], node["lat"]), "properties": get_element_props(node)}
+
+
+def bounds_to_shape(bounds):
+    return Polygon(
+        [
+            [bounds["minlon"], bounds["minlat"]],
+            [bounds["maxlon"], bounds["minlat"]],
+            [bounds["maxlon"], bounds["maxlat"]],
+            [bounds["minlon"], bounds["maxlat"]],
+            [bounds["minlon"], bounds["minlat"]],
+        ]
+    )
 
 
 def get_element_props(el, keys: list = None):
@@ -309,15 +437,26 @@ def way_to_shape(
         center = way["center"]
         return {"shape": Point(center["lon"], center["lat"]), "properties": get_element_props(way)}
 
-    if "geometry" in way and len(way["geometry"]) > 0:
-        coords = [[nd["lon"], nd["lat"]] for nd in way["geometry"]]
+    if way.get("geometry"):
+        # tolerate null/empty vertices (tainted "out geom" data) — build partial geometry
+        coords = [
+            [nd["lon"], nd["lat"]]
+            for nd in way["geometry"]
+            if nd is not None and "lon" in nd and "lat" in nd
+        ]
 
     elif "nodes" in way and len(way["nodes"]) > 0:
         coords = []
         for ref in way["nodes"]:
             node = get_node_ref(ref, refs_index)
+            if node is not None and "lon" not in node:
+                # skeleton node (e.g. "out ids") - no geometry to contribute
+                node = None
             if node:
-                node["used"] = way["id"]
+                # nodes with own interesting tags (POIs) or referenced by relations
+                # stay separate features
+                if not (has_interesting_tags(node.get("tags")) or node.get("_relation_member")):
+                    node["used"] = way["id"]
                 coords.append([node["lon"], node["lat"]])
             else:
                 message = get_message(
@@ -325,8 +464,8 @@ def way_to_shape(
                 )
                 warning(message)
                 if raise_on_failure:
-                    raise Exception(message)
-                return None
+                    raise ConversionError(message)
+                # build partial geometry from the nodes we do have
 
     elif "ref" in way:
         # Try to get ref silently first (common in incomplete relation data)
@@ -338,17 +477,12 @@ def way_to_shape(
             )
             if raise_on_failure:
                 message = get_message("Ref for way not found in index", pformat(way))
-                raise Exception(message)
+                raise ConversionError(message)
             return None
 
-        if "id" in way:
-            ref["used"] = way["id"]
-        elif "used" in way:
-            ref["used"] = way["used"]
-        else:
-            # filter will not work for this situation
-            warning("Failed to mark ref as used", pformat(ref), "for way", pformat(way))
-            # do we need to raise expection here? I don't think so
+        used_by = way.get("id", way.get("used"))
+        if used_by is not None and not has_interesting_tags(ref.get("tags")):
+            ref["used"] = used_by
         ref_way = way_to_shape(
             ref, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
         )
@@ -356,25 +490,31 @@ def way_to_shape(
             message = get_message("Way by ref not converted to shape", pformat(way))
             warning(message)
             if raise_on_failure:
-                raise Exception(message)
+                raise ConversionError(message)
             return None
         coords = (
             ref_way["shape"].exterior if isinstance(ref_way["shape"], Polygon) else ref_way["shape"]
         ).coords
+
+    elif "bounds" in way:
+        # "out bb" responses carry only a bounding box
+        return {"shape": bounds_to_shape(way["bounds"]), "properties": get_element_props(way)}
 
     else:
         # throw exception
         message = get_message("Relation has way without nodes", pformat(way))
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         return None
 
     if len(coords) < 2:
+        if "bounds" in way:
+            return {"shape": bounds_to_shape(way["bounds"]), "properties": get_element_props(way)}
         message = get_message("Not found coords for way", pformat(way))
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         return None
 
     props = get_element_props(way)
@@ -386,7 +526,7 @@ def way_to_shape(
             message = get_message("Failed to generate polygon from way", pformat(way))
             warning(message)
             if raise_on_failure:
-                raise Exception(message)
+                raise ConversionError(message)
             return None
     else:
         return {"shape": LineString(coords), "properties": props}
@@ -402,6 +542,8 @@ def is_exception(node, area_keys: Optional[dict] = None):
 
 
 def is_same_coords(a, b):
+    if a is None or b is None:
+        return False
     return a["lat"] == b["lat"] and a["lon"] == b["lon"]
 
 
@@ -415,20 +557,18 @@ def is_geometry_polygon(
     if "area" in tags and tags["area"] == "no":
         return False
 
+    # An unclosed way is never a polygon, whatever its tags say
+    # (also covers issue #7 and barrier=wall)
+    if "geometry" in node and not is_same_coords(node["geometry"][0], node["geometry"][-1]):
+        return False
+    if "nodes" in node and node["nodes"][0] != node["nodes"][-1]:
+        return False
+
     if "area" in tags and tags["area"] == "yes":
         return True
 
-    if "type" in tags and tags["type"] == "multipolygon":
+    if "type" in tags and tags["type"] in ("multipolygon", "boundary"):
         return True
-
-    # Fix for issue #7, but should be handled by id-area-keys or osm-polygon-features
-    # For example https://github.com/tyrasd/osm-polygon-features/issues/5
-    if "geometry" in node and not is_same_coords(node["geometry"][0], node["geometry"][-1]):
-        return False
-
-    # For issue #7 and situation with barrier=wall
-    if "nodes" in node and node["nodes"][0] != node["nodes"][-1]:
-        return False
 
     is_polygon = is_geometry_polygon_without_exceptions(node, polygon_features)
     if is_polygon:
@@ -509,17 +649,24 @@ def relation_to_shape(
         center = rel["center"]
         return {"shape": Point(center["lon"], center["lat"]), "properties": get_element_props(rel)}
 
+    shape = None
     try:
         if is_geometry_polygon(rel, area_keys, polygon_features):
-            return multipolygon_relation_to_shape(
+            shape = multipolygon_relation_to_shape(
                 rel, refs_index, raise_on_failure=raise_on_failure
             )
-        return multiline_realation_to_shape(rel, refs_index, raise_on_failure=raise_on_failure)
+        else:
+            shape = multiline_realation_to_shape(rel, refs_index, raise_on_failure=raise_on_failure)
     except Exception as e:
         message = get_message("Failed to convert relation to shape: \n", pformat(e), pformat(rel))
         error(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
+
+    if shape is None and "bounds" in rel:
+        # "out bb" responses carry only a bounding box
+        return {"shape": bounds_to_shape(rel["bounds"]), "properties": get_element_props(rel)}
+    return shape
 
 
 def multiline_realation_to_shape(
@@ -541,19 +688,28 @@ def multiline_realation_to_shape(
             message = get_message("Ref for multiline relation not found in index", pformat(rel))
             error(message)
             if raise_on_failure:
-                raise Exception(message)
+                raise ConversionError(message)
             return None
         members = found_ref["members"]
 
+    rel_id = rel.get("id", rel.get("ref"))
+    rel_type = (rel.get("tags") or {}).get("type")
+
     for member in members:
         if member["type"] == "way":
+            # for linear relation types, members without own interesting tags are
+            # represented by the relation itself (same rule as osmtogeojson)
+            if rel_type in ("route", "waterway"):
+                found_way = get_ref(member, refs_index, silent=True)
+                if found_way is not None and not has_interesting_tags(found_way.get("tags")):
+                    found_way["used"] = rel_id
             way_shape = way_to_shape(
                 member, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
             )
         elif member["type"] == "relation":
             found_member = get_ref(member, refs_index, silent=True)
-            if found_member:
-                found_member["used"] = rel["id"]
+            if found_member is not None and not has_interesting_tags(found_member.get("tags")):
+                found_member["used"] = rel_id
             way_shape = element_to_shape(
                 member, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
             )
@@ -566,14 +722,14 @@ def multiline_realation_to_shape(
             )
             if raise_on_failure:
                 message = get_message("multiline member not handled", pformat(member))
-                raise Exception(message)
+                raise ConversionError(message)
             continue
 
         if way_shape is None:
             missing_members.append(member)
             if raise_on_failure:
                 message = get_message("Failed to make way in relation", pformat(rel))
-                raise Exception(message)
+                raise ConversionError(message)
             continue
 
         if isinstance(way_shape["shape"], Polygon):
@@ -588,7 +744,7 @@ def multiline_realation_to_shape(
         message = get_message("No lines for multiline relation", pformat(rel))
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         return None
 
     multiline = MultiLineString(lines)
@@ -616,9 +772,11 @@ def multipolygon_relation_to_shape(
             message = get_message("Ref for multipolygon relation not found in index", pformat(rel))
             error(message)
             if raise_on_failure:
-                raise Exception(message)
+                raise ConversionError(message)
             return None
         members = found_ref["members"]
+
+    rel_id = rel.get("id", rel.get("ref"))
 
     for member in members:
         if member["type"] != "way":
@@ -630,25 +788,11 @@ def multipolygon_relation_to_shape(
             )
             if raise_on_failure:
                 message = get_message("Multipolygon member not handled", pformat(member))
-                raise Exception(message)
+                raise ConversionError(message)
             continue
 
-        member["used"] = rel["id"]
-
-        # When member ways are also returned as separate elements (e.g. "rel(ID); way(r);
-        # out geom;"), members carry inline geometry and way_to_shape never touches the
-        # indexed element, so mark it as used here. Ways with their own interesting tags
-        # (islands inside a lake, nature reserves, ...) are features in their own right
-        # and stay in the output. For ref-resolved outer ways the relation's tags don't
-        # count as interesting (old-style multipolygon tagging); members with inline
-        # geometry keep their own tags meaningful.
-        found_way = get_ref(member, refs_index, silent=True)
-        if found_way is not None:
-            ignore_tags = None
-            if member.get("role") == "outer" and "geometry" not in member:
-                ignore_tags = rel.get("tags")
-            if not has_interesting_tags(found_way.get("tags"), ignore_tags):
-                found_way["used"] = rel["id"]
+        member["used"] = rel_id
+        mark_member_way_used(member, rel, refs_index, rel_id)
 
         way_shape = way_to_shape(
             member, refs_index, area_keys, polygon_features, raise_on_failure=raise_on_failure
@@ -659,7 +803,7 @@ def multipolygon_relation_to_shape(
                 message = get_message(
                     "Failed to make way", pformat(member), "in relation", pformat(rel)
                 )
-                raise Exception(message)
+                raise ConversionError(message)
             continue
 
         if isinstance(way_shape["shape"], Polygon):
@@ -677,7 +821,7 @@ def multipolygon_relation_to_shape(
         )
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         return None
 
     multipolygon = fix_invalid_polygon(multipolygon)
@@ -690,10 +834,59 @@ def multipolygon_relation_to_shape(
         )
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         return None
 
+    old_style = old_style_multipolygon_shape(rel, members, refs_index, rel_id, multipolygon)
+    if old_style is not None:
+        return old_style
     return {"shape": multipolygon, "properties": get_element_props(rel)}
+
+
+def mark_member_way_used(member, rel, refs_index, rel_id):
+    """Mark the indexed element behind a relation-member way as used.
+
+    When member ways are also returned as separate elements (e.g. "rel(ID);
+    way(r); out geom;"), members carry inline geometry and way_to_shape never
+    touches the indexed element, so it must be marked here. Ways with their
+    own interesting tags (islands inside a lake, nature reserves, ...) are
+    features in their own right and stay in the output. For ref-resolved
+    outer ways the relation's tags don't count as interesting (old-style
+    multipolygon tagging, same rule as osmtogeojson); members with inline
+    geometry keep their own tags meaningful.
+    """
+    found_way = get_ref(member, refs_index, silent=True)
+    if found_way is None:
+        return
+    ignore_tags = None
+    if member.get("role") == "outer" and "geometry" not in member:
+        ignore_tags = rel.get("tags")
+    if not has_interesting_tags(found_way.get("tags"), ignore_tags):
+        found_way["used"] = rel_id
+
+
+def old_style_multipolygon_shape(rel, members, refs_index, rel_id, multipolygon):
+    """Attribute an old-style multipolygon to its outer way, like osmtogeojson.
+
+    Old-style tagging puts the tags on the single outer way while the relation
+    carries only type=multipolygon. Returns the shape dict for such relations,
+    or None for modern multipolygons (tags on the relation).
+    """
+    outer_members = [m for m in members if m.get("role", "outer") in ("outer", "")]
+    if len(outer_members) != 1 or has_interesting_tags(rel.get("tags"), {"type": True}):
+        return None
+    outer = outer_members[0]
+    found_way = get_ref(outer, refs_index, silent=True)
+    if found_way is not None:
+        found_way["used"] = rel_id  # the way is represented by this feature now
+        props = get_element_props(found_way)
+    else:
+        # "out geom" data: the member way is not a separate element
+        props = {"type": "way", "id": outer["ref"]}
+        if outer.get("tags"):
+            props["tags"] = outer["tags"]
+    # this feature carries the way's id on purpose - "keep" shields it from filter_used_refs
+    return {"shape": multipolygon, "properties": props, "keep": True}
 
 
 def to_multipolygon(obj, raise_on_failure=False):
@@ -701,7 +894,7 @@ def to_multipolygon(obj, raise_on_failure=False):
         return obj
 
     if isinstance(obj, GeometryCollection):
-        p = [el for el in obj if isinstance(el, Polygon)]
+        p = [el for el in obj.geoms if isinstance(el, Polygon)]
         return MultiPolygon(p)
 
     if isinstance(obj, Polygon):
@@ -711,7 +904,7 @@ def to_multipolygon(obj, raise_on_failure=False):
     message = get_message("Failed to convert to multipolygon", type(obj))
     warning(message)
     if raise_on_failure:
-        raise Exception(message)
+        raise ConversionError(message)
     return None
 
 
@@ -732,7 +925,7 @@ def _convert_lines_to_multipolygon(lines, raise_on_failure=False):
                 message = get_message("Failed to build polygon", pformat(line))
                 warning(message)
                 if raise_on_failure:
-                    raise Exception(message)
+                    raise ConversionError(message)
         return to_multipolygon(unary_union(polygons), raise_on_failure=raise_on_failure)
     try:
         poly = Polygon(merged_line)
@@ -740,7 +933,7 @@ def _convert_lines_to_multipolygon(lines, raise_on_failure=False):
         message = get_message("Failed to convert lines to polygon", pformat(e))
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         # traceback.print_exc()
         return None
     return to_multipolygon(poly, raise_on_failure=raise_on_failure)
@@ -751,7 +944,7 @@ def _convert_shapes_to_multipolygon(shapes, raise_on_failure=False):
         message = "Failed to create multipolygon (Empty)"
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         return None
 
     # Group shapes by role using consecutive grouping
@@ -796,7 +989,7 @@ def _convert_shapes_to_multipolygon(shapes, raise_on_failure=False):
         message = 'Failed to create multipolygon. Shape with "outer" role not found'
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         return None
 
     if not multipolygon.is_valid:
@@ -807,7 +1000,7 @@ def _convert_shapes_to_multipolygon(shapes, raise_on_failure=False):
         )
         warning(message)
         if raise_on_failure:
-            raise Exception(message)
+            raise ConversionError(message)
         return None
 
     # Iterate over the rest if there are any
@@ -824,7 +1017,7 @@ def _convert_shapes_to_multipolygon(shapes, raise_on_failure=False):
             message = get_message("Failed to compute multipolygon. Failing geometry:", role, geom)
             warning(message)
             if raise_on_failure:
-                raise Exception(message)
+                raise ConversionError(message)
             return None
 
     return multipolygon

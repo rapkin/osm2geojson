@@ -9,12 +9,29 @@ Main functions:
 - xml2shapes: Convert OSM XML to Shape objects
 - json2shapes: Convert Overpass JSON to Shape objects
 - shape_to_feature: Convert a Shape object to a GeoJSON Feature
+- overpass_call: Fetch data from the Overpass API
+- ConversionError: Raised on conversion failure (with raise_on_failure=True)
+
+Logging: the library logs through the "osm2geojson" logger and never
+configures logging itself - enable diagnostics with
+logging.getLogger("osm2geojson").setLevel(...) in your application.
 """
 
-from .helpers import overpass_call, read_data_file
-from .main import json2geojson, json2shapes, shape_to_feature, xml2geojson, xml2shapes
+import logging
+
+from .helpers import overpass_call
+from .main import (
+    ConversionError,
+    json2geojson,
+    json2shapes,
+    shape_to_feature,
+    xml2geojson,
+    xml2shapes,
+)
 from .parse_xml import parse as parse_xml
 
+
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 # Version is defined in pyproject.toml
 try:
@@ -24,11 +41,11 @@ try:
 except Exception:
     __version__ = "unknown"
 __all__ = [
+    "ConversionError",
     "json2geojson",
     "json2shapes",
     "overpass_call",
     "parse_xml",
-    "read_data_file",
     "shape_to_feature",
     "xml2geojson",
     "xml2shapes",

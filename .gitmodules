@@ -3,4 +3,4 @@
 	url = https://github.com/tyrasd/osm-polygon-features
 [submodule "id-area-keys"]
 	path = id-area-keys
-	url = https://github.com/osmlab/id-area-keys
+	url = https://github.com/ideditor/id-area-keys

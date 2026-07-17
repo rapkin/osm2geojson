@@ -232,6 +232,19 @@ Available in `tests/conftest.py`:
 - `get_osm_and_geojson(name)` - Get OSM XML + GeoJSON pair
 - `get_json_and_geojson(name)` - Get JSON + GeoJSON pair
 
+### osmtogeojson Compatibility
+Compatibility with the JS converter [osmtogeojson](https://github.com/tyrasd/osmtogeojson)
+is tested by `tests/test_osmtogeojson_compat.py` (part of the normal test run).
+To compare/benchmark both converters on arbitrary OSM files (needs node/npm):
+
+```bash
+venv/bin/python tests/tools/compare_osmtogeojson.py --html report.html tests/data/*.osm
+```
+
+It reports each geometry difference as expected (known intentional difference,
+with reason) or UNEXPECTED — treat UNEXPECTED as a bug until proven otherwise.
+See `tests/tools/README.md`.
+
 ---
 
 ## 🔧 Common Tasks

@@ -188,6 +188,24 @@ See `tests/conftest.py` for pytest fixtures:
 - `get_osm_and_geojson(name)`
 - `get_json_and_geojson(name)`
 
+### Comparing Against osmtogeojson
+
+osm2geojson aims to stay compatible with [osmtogeojson](https://github.com/tyrasd/osmtogeojson)
+(the JS converter used by overpass-turbo). Two layers check this:
+
+- `tests/test_osmtogeojson_compat.py` — replays osmtogeojson's own test suite
+  (recorded in `tests/data/osmtogeojson-fixtures.json`); runs as part of `make test`.
+- `tests/tools/compare_osmtogeojson.py` — compares and benchmarks both converters
+  on arbitrary OSM files and can write an HTML report (requires node/npm):
+
+  ```bash
+  venv/bin/python tests/tools/compare_osmtogeojson.py --html report.html \
+      tests/data/*.osm tests/data/*.json
+  ```
+
+  Useful for checking geometry changes against real data before a release.
+  See `tests/tools/README.md` for details.
+
 ---
 
 ## Code Style

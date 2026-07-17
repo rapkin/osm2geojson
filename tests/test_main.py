@@ -2,10 +2,11 @@ import json
 import os
 import unittest
 
-from osm2geojson import json2geojson, overpass_call, read_data_file, xml2geojson
+from osm2geojson import json2geojson, overpass_call, xml2geojson
+from tests.utils import read_data_file
 
 
-LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS")
+LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS", "").lower() not in ("", "0", "false")
 
 
 def get_osm_and_geojson_data(name):
@@ -40,7 +41,9 @@ class TestOsm2GeoJsonMethods(unittest.TestCase):
         """
         xml = overpass_call("rel(448930); out geom;")
         data = xml2geojson(xml)
-        self.assertEqual(len(data["features"]), 1)
+        relations = [f for f in data["features"] if f["properties"]["type"] == "relation"]
+        self.assertEqual(len(relations), 1)
+        self.assertEqual(relations[0]["geometry"]["type"], "MultiPolygon")
 
     def test_issue_4(self):
         (data, saved_geojson) = get_osm_and_geojson_data("issue-4")

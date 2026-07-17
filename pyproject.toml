@@ -13,7 +13,7 @@ authors = [
 ]
 keywords = ["geometry", "gis", "osm", "parsing"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -43,7 +43,7 @@ osm2geojson = "osm2geojson.__main__:main"
 packages = ["osm2geojson"]
 
 [tool.setuptools.package-data]
-osm2geojson = ["*.json"]
+osm2geojson = ["*.json", "py.typed"]
 
 [project.optional-dependencies]
 dev = [

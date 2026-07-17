@@ -1,7 +1,7 @@
 """Tests for issue #54: OSM relations with non-consecutive role ordering."""
 
 import osm2geojson
-from osm2geojson.helpers import read_data_file
+from tests.utils import read_data_file
 
 
 def test_issue_54_staffordshire_multipolygon():
@@ -18,10 +18,12 @@ def test_issue_54_staffordshire_multipolygon():
     data = read_data_file("issue-54-staffordshire.osm")
     geojson = osm2geojson.xml2geojson(data, filter_used_refs=False)
 
-    # Should have exactly one feature (the county boundary relation)
-    assert len(geojson["features"]) == 1, "Should have exactly one feature"
+    # Should have exactly one relation feature (the county boundary); member nodes
+    # (e.g. admin_centre) come along as separate Point features
+    relations = [f for f in geojson["features"] if f["properties"]["type"] == "relation"]
+    assert len(relations) == 1, "Should have exactly one relation feature"
 
-    feature = geojson["features"][0]
+    feature = relations[0]
     assert feature["geometry"]["type"] == "MultiPolygon"
 
     # Get the coordinates
