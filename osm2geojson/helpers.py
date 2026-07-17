@@ -70,7 +70,7 @@ def overpass_call(
         if r.status_code == 200:
             return r.text
         error = requests.exceptions.HTTPError(
-            f"Overpass server respond with status {r.status_code}"
+            f"Overpass server responded with status {r.status_code}"
         )
         if r.status_code not in RETRIABLE_STATUSES:
             raise error

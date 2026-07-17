@@ -76,6 +76,21 @@ def test_converter_options_are_keyword_only():
         json2geojson(data, False)
 
 
+def test_inline_member_node_shared_by_relations_is_one_feature():
+    """A node existing only inline in two relations must not be duplicated."""
+    member = {"type": "node", "ref": 7, "role": "admin_centre", "lat": 0.5, "lon": 0.5}
+    data = {
+        "elements": [
+            {"type": "relation", "id": 1, "tags": {"type": "site"}, "members": [dict(member)]},
+            {"type": "relation", "id": 2, "tags": {"type": "site"}, "members": [dict(member)]},
+        ]
+    }
+    features = json2geojson(data)["features"]
+    points = [f for f in features if f["properties"].get("type") == "node"]
+    assert len(points) == 1
+    assert points[0]["properties"]["id"] == 7
+
+
 def test_public_surface():
     assert "read_data_file" not in osm2geojson.__all__
     assert not hasattr(osm2geojson, "read_data_file")

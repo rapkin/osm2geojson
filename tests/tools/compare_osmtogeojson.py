@@ -85,7 +85,7 @@ def run_js(files, runs):
 
 def run_py(path, runs):
     """Convert + benchmark one file with osm2geojson. -> (geojson, times_ms)"""
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     if input_type(path) == "json":
         convert = lambda: json2geojson(json.loads(text))  # noqa: E731
     else:
@@ -549,7 +549,7 @@ def main():
         print_console(result, args.verbose)
 
     if args.html:
-        args.html.write_text(build_html(results, args.tolerance, args.runs))
+        args.html.write_text(build_html(results, args.tolerance, args.runs), encoding="utf-8")
         print(f"\nHTML report: {args.html}")
     sys.exit(0 if all_ok else 1)
 

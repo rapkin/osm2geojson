@@ -281,12 +281,15 @@ def mark_relation_members(elements, refs_index):
     they show up as Point features: they are returned for the caller to add
     to the element list and index.
     """
-    synthesized = []
+    synthesized = {}
     for el in elements:
         if el["type"] != "relation":
             continue
         for member in el.get("members", []):
             found = get_ref(member, refs_index, silent=True)
+            if found is None:
+                # a node already synthesized for another relation's member
+                found = synthesized.get(_get_ref_name(member["type"], member["ref"]))
             if found is not None:
                 found["_relation_member"] = True
             elif member["type"] == "node" and "lat" in member and "lon" in member:
@@ -299,8 +302,8 @@ def mark_relation_members(elements, refs_index):
                 }
                 if member.get("tags"):
                     node["tags"] = member["tags"]
-                synthesized.append(node)
-    return synthesized
+                synthesized[get_ref_name(node)] = node
+    return list(synthesized.values())
 
 
 def _element_rank(el):
