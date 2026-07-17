@@ -186,4 +186,4 @@ Developed by [rapkin](https://github.com/rapkin)
 
 Uses data from:
 - [osm-polygon-features](https://github.com/tyrasd/osm-polygon-features) - polygon feature definitions
-- [id-area-keys](https://github.com/osmlab/id-area-keys) - area key definitions
+- [id-area-keys](https://github.com/ideditor/id-area-keys) - area key definitions (extracted from the iD editor's [tagging schema](https://github.com/openstreetmap/id-tagging-schema))
