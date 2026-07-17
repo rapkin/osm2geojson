@@ -944,7 +944,7 @@
       "type": "way",
       "tags": {
         "addr:housenumber": "27",
-        "addr:street": "\u0414\u0440\u0430\u0433\u043e\u043c\u0430\u043d\u043e\u0432\u0430 \u0432\u0443\u043b\u0438\u0446\u044f",
+        "addr:street": "Драгоманова вулиця",
         "building": "yes",
         "building:levels": "3"
       },
@@ -1004,7 +1004,7 @@
       "timestamp": "2017-03-21T16:01:43Z",
       "version": 3,
       "changeset": 47044280,
-      "user": "Aurimas Fi\u0161eras",
+      "user": "Aurimas Fišeras",
       "uid": 651869,
       "type": "way",
       "nodes": [
@@ -1060,8 +1060,8 @@
       "type": "way",
       "tags": {
         "amenity": "school",
-        "name": "\u0428\u043a\u043e\u043b\u0430 \u21162",
-        "official_name": "\u0420\u0456\u0432\u043d\u0435\u043d\u0441\u044c\u043a\u0438\u0439 \u041d\u0412\u041a \"\u0428\u043a\u043e\u043b\u0430-\u043b\u0456\u0446\u0435\u0439\" \u21162 \u0420\u041c\u0420"
+        "name": "Школа №2",
+        "official_name": "Рівненський НВК \"Школа-ліцей\" №2 РМР"
       },
       "nodes": [
         1264073677,
@@ -1195,7 +1195,7 @@
       "timestamp": "2017-03-21T16:01:43Z",
       "version": 2,
       "changeset": 47044280,
-      "user": "Aurimas Fi\u0161eras",
+      "user": "Aurimas Fišeras",
       "uid": 651869,
       "type": "relation",
       "members": [
@@ -1220,7 +1220,7 @@
       "timestamp": "2018-02-04T12:21:30Z",
       "version": 9,
       "changeset": 56053504,
-      "user": "\u0421\u0435\u0440\u0433\u0456\u0439 \u0414\u0443\u0431\u0438\u043a",
+      "user": "Сергій Дубик",
       "uid": 423716,
       "type": "relation",
       "members": [
@@ -1336,7 +1336,7 @@
         }
       ],
       "tags": {
-        "name": "\u0414\u0440\u0430\u0433\u043e\u043c\u0430\u043d\u043e\u0432\u0430 \u0432\u0443\u043b\u0438\u0446\u044f",
+        "name": "Драгоманова вулиця",
         "type": "associatedStreet"
       }
     }

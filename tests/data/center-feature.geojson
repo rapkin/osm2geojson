@@ -1,42 +1,42 @@
 {
-  "type":"FeatureCollection",
-  "features":[
+  "type": "FeatureCollection",
+  "features": [
     {
-      "type":"Feature",
-      "properties":{
-        "type":"relation",
-        "id":448930,
-        "tags":{
-          "admin_level":"6",
-          "boundary":"administrative",
-          "flag":"http://upload.wikimedia.org/wikipedia/commons/b/bf/Flag_of_Rivne.svg",
-          "int_name":"Rivne",
-          "koatuu":"5610100000",
-          "name":"\u0420\u0456\u0432\u043d\u0435",
-          "name:be":"\u0420\u043e\u045e\u043d\u0430",
-          "name:de":"Riwne",
-          "name:en":"Rivne",
-          "name:eo":"Rivno",
-          "name:fr":"Rivne",
-          "name:hu":"Rivne",
-          "name:lt":"Rivn\u0117",
-          "name:pl":"R\u00f3wne",
-          "name:ru":"\u0420\u043e\u0432\u043d\u043e",
-          "name:sr":"\u0420\u043e\u0432\u043d\u043e",
-          "name:uk":"\u0420\u0456\u0432\u043d\u0435",
-          "old_name":"\u0420\u043e\u0432\u043d\u043e",
-          "place":"city",
-          "population":"245323",
-          "source":"landsat",
-          "type":"boundary",
-          "wikidata":"Q156739",
-          "wikipedia":"uk:\u0420\u0456\u0432\u043d\u0435",
-          "wikipedia:pl":"R\u00f3wne"
+      "type": "Feature",
+      "properties": {
+        "type": "relation",
+        "id": 448930,
+        "tags": {
+          "admin_level": "6",
+          "boundary": "administrative",
+          "flag": "http://upload.wikimedia.org/wikipedia/commons/b/bf/Flag_of_Rivne.svg",
+          "int_name": "Rivne",
+          "koatuu": "5610100000",
+          "name": "Рівне",
+          "name:be": "Роўна",
+          "name:de": "Riwne",
+          "name:en": "Rivne",
+          "name:eo": "Rivno",
+          "name:fr": "Rivne",
+          "name:hu": "Rivne",
+          "name:lt": "Rivnė",
+          "name:pl": "Równe",
+          "name:ru": "Ровно",
+          "name:sr": "Ровно",
+          "name:uk": "Рівне",
+          "old_name": "Ровно",
+          "place": "city",
+          "population": "245323",
+          "source": "landsat",
+          "type": "boundary",
+          "wikidata": "Q156739",
+          "wikipedia": "uk:Рівне",
+          "wikipedia:pl": "Równe"
         }
       },
-      "geometry":{
-        "type":"Point",
-        "coordinates":[
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
           26.2443283,
           50.6108274
         ]

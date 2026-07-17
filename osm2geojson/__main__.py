@@ -84,7 +84,7 @@ def main(args=None) -> int:
         )
         return 1
 
-    with open(args.infile) as f:
+    with open(args.infile, encoding="utf-8") as f:
         data = f.read()
 
     log_level = "WARNING"
@@ -95,13 +95,13 @@ def main(args=None) -> int:
 
     area_keys = None
     if args.areas:
-        with open(args.areas) as f:
+        with open(args.areas, encoding="utf-8") as f:
             area_keys = json.load(f)
             if "areaKeys" in area_keys and len(area_keys) == 1:
                 area_keys = area_keys["areaKeys"]
     polygon_features = None
     if args.polygons:
-        with open(args.polygons) as f:
+        with open(args.polygons, encoding="utf-8") as f:
             polygon_features = json.load(f)
 
     result = parser_function(
@@ -118,11 +118,13 @@ def main(args=None) -> int:
     if args.outfile == "-":
         target = sys.stdout
     else:
-        target = open(args.outfile, "w")
+        target = open(args.outfile, "w", encoding="utf-8")
 
     code = 0
     try:
-        print(json.dumps(result, indent=indent), file=target)
+        # ensure_ascii=False: keep non-ASCII text (names, descriptions) readable
+        # instead of \uXXXX escapes
+        print(json.dumps(result, indent=indent, ensure_ascii=False), file=target)
     except (TypeError, ValueError) as exc:
         print(exc, file=sys.stderr)
         print("Falling back to raw dumping the object...", file=sys.stderr)

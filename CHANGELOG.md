@@ -46,6 +46,9 @@ produced for the same input is not:
   being dropped.
 - Overpass API requests send an identifying User-Agent (overpass-api.de
   rejects generic clients with 406) and use a request timeout.
+- CLI output keeps non-ASCII text (names, addresses) as readable UTF-8
+  instead of \\uXXXX escapes, and file I/O uses UTF-8 explicitly regardless
+  of the platform locale.
 
 ### Added
 
