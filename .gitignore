@@ -152,3 +152,4 @@ Thumbs.db
 # Project specific
 *.bak
 .coverage
+report.html
