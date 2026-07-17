@@ -1,7 +1,7 @@
 """Tests for issue #54: OSM relations with non-consecutive role ordering."""
 
 import osm2geojson
-from osm2geojson.helpers import read_data_file
+from tests.utils import read_data_file
 
 
 def test_issue_54_staffordshire_multipolygon():

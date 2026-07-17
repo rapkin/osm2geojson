@@ -26,14 +26,13 @@ Known, intentional differences (cases listed in KNOWN_DIFFERENCES):
     that filtering entirely for full-geometry responses and emits duplicates
 """
 
-import copy
 import json
 import unittest
 
 from shapely.geometry import shape
 
 from osm2geojson import json2geojson, xml2geojson
-from osm2geojson.helpers import read_data_file
+from tests.utils import read_data_file
 
 
 # case name -> list of expected difference descriptions (see _compare)
@@ -139,7 +138,9 @@ def _compare(py_result, js_output):
 def _run_case(call):
     if call["input_type"] == "xml":
         return xml2geojson(call["input"])
-    return json2geojson(copy.deepcopy(call["input"]))
+    # no defensive copy: the fixtures double as a canary for the guarantee
+    # that json2geojson does not mutate its input
+    return json2geojson(call["input"])
 
 
 class TestOsmtogeojsonCompat(unittest.TestCase):

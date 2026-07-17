@@ -2,7 +2,8 @@ import json
 import os
 import unittest
 
-from osm2geojson import overpass_call, parse_xml, read_data_file
+from osm2geojson import overpass_call, parse_xml
+from tests.utils import read_data_file
 
 
 LIVE_TESTS = os.environ.get("OSM2GEOJSON_LIVE_TESTS")

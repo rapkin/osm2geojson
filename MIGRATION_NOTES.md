@@ -2,6 +2,28 @@
 
 This document tracks changes from the old workflow to the new modernized workflow.
 
+## API changes in 1.0.0
+
+- **Converter options are keyword-only**: call
+  `json2geojson(data, filter_used_refs=False)`, not `json2geojson(data, False)`.
+- **Input data is no longer mutated**: converters used to annotate the passed
+  Overpass dict with internal keys (`used`); they now work on a copy.
+- **Logging is left alone by default**: `log_level` defaults to `None` (the old
+  default forced the library logger to `ERROR` on every call). Configure
+  diagnostics with `logging.getLogger("osm2geojson").setLevel(...)` or pass
+  `log_level=` explicitly.
+- **`ConversionError`** is raised on failures with `raise_on_failure=True`
+  (previously a bare `Exception`). It subclasses `Exception`, so existing
+  handlers keep working.
+- **`overpass_call`** gained keyword-only `endpoint`, `retries` and
+  `retry_delay` parameters; `timeout` is keyword-only now.
+- **Removed from the public API**: `read_data_file` (a test helper that never
+  worked in installed packages) and the `retry_request_multi` decorator.
+- **Converted output**: see the 1.0.0 release notes - the same input can yield
+  more features (POI nodes, relation members) and different geometry types
+  (boundary relations as MultiPolygon, unclosed `area=yes` ways as LineString),
+  matching osmtogeojson's behavior.
+
 ## Removed Files
 
 ### `lint.sh` (Removed)

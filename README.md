@@ -69,24 +69,35 @@ Convert OSM/Overpass XML to Shape objects.
 
 ### Options
 
-All conversion functions accept these optional parameters:
+All conversion functions accept these optional keyword-only parameters:
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `filter_used_refs` | bool | `True` | Filter unused references (False returns all geometry) |
-| `log_level` | str | `'ERROR'` | Logging level (`'DEBUG'`, `'INFO'`, `'WARNING'`, `'ERROR'`) |
+| `log_level` | str | `None` | Set the library logger level for this call (`'DEBUG'`, `'INFO'`, ...); `None` leaves your logging configuration untouched |
 | `area_keys` | dict | `None` | Custom area key definitions (defaults from `areaKeys.json`) |
 | `polygon_features` | list | `None` | Custom polygon feature whitelist/blacklist (defaults from `polygon-features.json`) |
-| `raise_on_failure` | bool | `False` | Raise exception on geometry conversion failure |
+| `raise_on_failure` | bool | `False` | Raise `ConversionError` on geometry conversion failure |
+
+Conversion functions never modify the data passed to them.
 
 ### Helper Functions
 
-#### `overpass_call(query)`
-Execute Overpass API query (with 5 automatic retries).
+#### `overpass_call(query, **options)`
+Execute Overpass API query.
 
 ```python
 result = osm2geojson.overpass_call('[out:json];node(50.746,7.154,50.748,7.157);out;')
 ```
+
+Optional keyword-only parameters:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `endpoint` | str | overpass-api.de | Overpass API endpoint URL |
+| `timeout` | float | `180` | Timeout in seconds for each HTTP request |
+| `retries` | int | `5` | Retries after a failed attempt (`0` disables retrying) |
+| `retry_delay` | float | `5` | Seconds to sleep between attempts |
 
 #### `shape_to_feature(shape_obj, properties)`
 Convert Shape object to GeoJSON Feature.

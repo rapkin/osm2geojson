@@ -3,6 +3,7 @@
   "private": true,
   "description": "JS-side dependencies for tests/tools (osmtogeojson comparison/benchmark)",
   "dependencies": {
-    "osmtogeojson": "3.0.0-beta.5"
+    "osmtogeojson": "3.0.0-beta.5",
+    "@xmldom/xmldom": "0.8.3"
   }
 }
