@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "osm2geojson"
-version = "0.3.2"
+version = "1.0.0rc1"
 description = "Parse OSM and Overpass JSON"
 readme = "README.md"
 license = {text = "MIT"}
