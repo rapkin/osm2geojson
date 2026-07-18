@@ -31,6 +31,19 @@ pip install osm2geojson
 
 Requires Python 3.8+.
 
+> **Try the 1.0 release candidate.** Version 1.0 changes the produced GeoJSON
+> (matching [osmtogeojson](https://github.com/tyrasd/osmtogeojson)) and cleans
+> up the API. Regular installs are unaffected until the final release; to test
+> it now:
+>
+> ```bash
+> pip install --pre --upgrade osm2geojson
+> ```
+>
+> See the [CHANGELOG](CHANGELOG.md) and [MIGRATION_NOTES.md](MIGRATION_NOTES.md)
+> for what changed - and please [report](https://github.com/rapkin/osm2geojson/issues)
+> any unexpected output differences.
+
 ## Quick start
 
 ```python
