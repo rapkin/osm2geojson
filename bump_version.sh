@@ -12,9 +12,10 @@ fi
 
 NEW_VERSION="$1"
 
-# Validate version format
-if ! echo "$NEW_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-    echo "❌ Error: Version must be in format X.Y.Z (e.g., 0.3.0)"
+# Validate version format: X.Y.Z with an optional pre-release suffix
+# (PEP 440: a1 / b2 / rc1), e.g. 0.3.0, 1.0.0rc1
+if ! echo "$NEW_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+((a|b|rc)[0-9]+)?$'; then
+    echo "❌ Error: Version must be X.Y.Z or X.Y.Z(a|b|rc)N (e.g., 0.3.0, 1.0.0rc1)"
     exit 1
 fi
 
