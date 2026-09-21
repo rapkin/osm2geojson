@@ -48,6 +48,10 @@ produced for the same input is not:
 
 - `shape_to_feature` accepts mixed, nested and empty GeometryCollections,
   preserving child geometries and converting their coordinates to lists.
+- `shape_to_feature` emitted `"type": "LinearRing"` for a LinearRing (such as
+  `Polygon.exterior`), which RFC 7946 does not define. Rings are now emitted as
+  closed LineStrings, with the same coordinates, including inside
+  GeometryCollections.
 - `filter_used_refs` compared ids across id-spaces, so a used node could
   delete an unrelated way/relation with the same numeric id.
 - `out center` / `out bb` responses: `<center>` is parsed from XML and

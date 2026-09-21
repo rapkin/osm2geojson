@@ -8,6 +8,7 @@ import copy
 import json
 
 import pytest
+from shapely.geometry import GeometryCollection
 from shapely.geometry import shape as shapely_shape
 
 import osm2geojson
@@ -137,3 +138,59 @@ def test_shape_to_feature_geometry_collection(geometry):
     assert feature == {"type": "Feature", "properties": properties, "geometry": geometry}
     assert json.loads(json.dumps(feature)) == feature
     assert shapely_shape(feature["geometry"]).equals_exact(original, 0)
+
+
+RFC7946_GEOMETRY_TYPES = {
+    "Point",
+    "MultiPoint",
+    "LineString",
+    "MultiLineString",
+    "Polygon",
+    "MultiPolygon",
+    "GeometryCollection",
+}
+
+
+def test_shape_to_feature_linear_ring_is_emitted_as_line_string():
+    """A LinearRing must not reach the output: it is not a GeoJSON geometry type.
+
+    ``Polygon.exterior`` is a LinearRing, so this is an easy shape to pass in by
+    hand. Shapely maps it to ``{"type": "LinearRing"}``, which RFC 7946 does not
+    define - shapely reads it back happily, but strict consumers reject it.
+    """
+    ring = shapely_shape(
+        {
+            "type": "Polygon",
+            "coordinates": [[[7.0, 50.0], [8.0, 50.0], [8.0, 51.0], [7.0, 50.0]]],
+        }
+    ).exterior
+    assert ring.geom_type == "LinearRing"
+
+    feature = shape_to_feature(ring, {"name": "outline"})
+
+    assert feature["geometry"]["type"] in RFC7946_GEOMETRY_TYPES
+    assert feature == {
+        "type": "Feature",
+        "properties": {"name": "outline"},
+        "geometry": {
+            "type": "LineString",
+            "coordinates": [[7.0, 50.0], [8.0, 50.0], [8.0, 51.0], [7.0, 50.0]],
+        },
+    }
+    assert json.loads(json.dumps(feature)) == feature
+    assert shapely_shape(feature["geometry"]).equals(ring)
+
+
+def test_shape_to_feature_linear_ring_inside_geometry_collection():
+    """The LinearRing rewrite has to reach children of a GeometryCollection too."""
+    ring = shapely_shape(
+        {"type": "Polygon", "coordinates": [[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 0.0]]]}
+    ).exterior
+    collection = GeometryCollection([ring])
+
+    feature = shape_to_feature(collection)
+
+    child_types = [child["type"] for child in feature["geometry"]["geometries"]]
+    assert child_types == ["LineString"]
+    assert set(child_types) <= RFC7946_GEOMETRY_TYPES
+    assert json.loads(json.dumps(feature)) == feature

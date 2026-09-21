@@ -406,8 +406,12 @@ def convert_coords_to_lists(coords):
 def _geometry_to_lists(geometry: dict) -> dict:
     if geometry["type"] == "GeometryCollection":
         geometry["geometries"] = [_geometry_to_lists(child) for child in geometry["geometries"]]
-    else:
-        geometry["coordinates"] = convert_coords_to_lists(geometry["coordinates"])
+        return geometry
+    if geometry["type"] == "LinearRing":
+        # shapely maps a LinearRing to its own type, which RFC 7946 does not define;
+        # a ring is a closed LineString, so emit that and keep the coordinates as they are
+        geometry["type"] = "LineString"
+    geometry["coordinates"] = convert_coords_to_lists(geometry["coordinates"])
     return geometry
 
 
