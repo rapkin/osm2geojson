@@ -46,6 +46,8 @@ produced for the same input is not:
 
 ### Fixed
 
+- `shape_to_feature` accepts mixed, nested and empty GeometryCollections,
+  preserving child geometries and converting their coordinates to lists.
 - `filter_used_refs` compared ids across id-spaces, so a used node could
   delete an unrelated way/relation with the same numeric id.
 - `out center` / `out bb` responses: `<center>` is parsed from XML and
