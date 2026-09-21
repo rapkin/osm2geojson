@@ -4,6 +4,6 @@
   "description": "JS-side dependencies for tests/tools (osmtogeojson comparison/benchmark)",
   "dependencies": {
     "osmtogeojson": "3.0.0-beta.5",
-    "@xmldom/xmldom": "0.8.13"
+    "@xmldom/xmldom": "0.8.15"
   }
 }
