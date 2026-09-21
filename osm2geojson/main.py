@@ -403,11 +403,18 @@ def convert_coords_to_lists(coords):
     return [convert_coords_to_lists(c) for c in coords]
 
 
+def _geometry_to_lists(geometry: dict) -> dict:
+    if geometry["type"] == "GeometryCollection":
+        geometry["geometries"] = [_geometry_to_lists(child) for child in geometry["geometries"]]
+    else:
+        geometry["coordinates"] = convert_coords_to_lists(geometry["coordinates"])
+    return geometry
+
+
 def shape_to_feature(g, props: dict = None):
     props = props or {}
-    # shapely returns tuples (we need lists)
-    g = mapping(g)
-    g["coordinates"] = convert_coords_to_lists(g["coordinates"])
+    # shapely returns tuples (we need lists), including inside collections
+    g = _geometry_to_lists(mapping(g))
     return {"type": "Feature", "properties": props, "geometry": g}
 
 

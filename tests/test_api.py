@@ -8,9 +8,10 @@ import copy
 import json
 
 import pytest
+from shapely.geometry import shape as shapely_shape
 
 import osm2geojson
-from osm2geojson import ConversionError, json2geojson, json2shapes
+from osm2geojson import ConversionError, json2geojson, json2shapes, shape_to_feature
 
 
 SQUARE_NODES = [
@@ -95,3 +96,44 @@ def test_public_surface():
     assert "read_data_file" not in osm2geojson.__all__
     assert not hasattr(osm2geojson, "read_data_file")
     assert "ConversionError" in osm2geojson.__all__
+
+
+@pytest.mark.parametrize(
+    "geometry",
+    [
+        {
+            "type": "GeometryCollection",
+            "geometries": [
+                {"type": "Point", "coordinates": [7.0, 50.0]},
+                {"type": "LineString", "coordinates": [[7.0, 50.0], [8.0, 51.0]]},
+            ],
+        },
+        {
+            "type": "GeometryCollection",
+            "geometries": [
+                {
+                    "type": "GeometryCollection",
+                    "geometries": [
+                        {"type": "Point", "coordinates": [7.0, 50.0, 100.0]},
+                        {
+                            "type": "MultiLineString",
+                            "coordinates": [[[7.0, 50.0, 100.0], [8.0, 51.0, 110.0]]],
+                        },
+                    ],
+                },
+                {"type": "GeometryCollection", "geometries": []},
+            ],
+        },
+        {"type": "GeometryCollection", "geometries": []},
+    ],
+    ids=["mixed", "nested-with-altitude", "empty"],
+)
+def test_shape_to_feature_geometry_collection(geometry):
+    properties = {"name": "survey", "id": 42}
+    original = shapely_shape(geometry)
+
+    feature = shape_to_feature(original, properties)
+
+    assert feature == {"type": "Feature", "properties": properties, "geometry": geometry}
+    assert json.loads(json.dumps(feature)) == feature
+    assert shapely_shape(feature["geometry"]).equals_exact(original, 0)
